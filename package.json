@@ -1,0 +1,21 @@
+{
+  "name": "noteapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"vite > NUL 2>&1\" \"node app.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "vite": "^5.4.9",
+    "concurrently": "^7.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "vue": "^3.5.12"
+  }
+}
