@@ -1,6 +1,8 @@
-URI:
+URI: 
 mongodb://root:campus2023@localhost:27017/
-
+(recordar poner la de atlas para poder dejarlo desplegado)
+URIATLAS:
+mongodb+srv://kadavzu:carlos123@clustercarlos.qb1yv8u.mongodb.net/
 
 
 .env:
