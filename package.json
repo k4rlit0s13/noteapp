@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite > NUL 2>&1\" \"node app.js\""
+    "dev": "concurrently \"clear && vite\" \"node app.js\""
   },
   "keywords": [],
   "author": "",
