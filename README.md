@@ -1,6 +1,7 @@
 npm i vue
 npm i dotenv
 npm i express
+npm i vue-router
 npm i vite --save-dev
 npm i @vitejs/plugin-vue --save-dev
 npm i concurrently --save-dev
@@ -10,17 +11,24 @@ npm i concurrently --save-dev
 
 NOTEAPP
 ├── node_modules
+├── server
+│   └── router
+│      
 ├── src
 │   ├── components
-│   │   └── index.vue
+│   │   ├── index.vue
+│   │   └── home.vue
 │   ├── js
-│   │   └── main.js
+│   │   ├── main.js
+│   │   └── home.js
 │   └── views
-│       ├── home.html
-│       └── index.html
+│       ├── index.html
+│       └── home.html
 ├── .gitignore
 ├── app.js
+├── .env
 ├── package-lock.json
 ├── package.json
-├── text.md
 └── vite.config.js
+
+
