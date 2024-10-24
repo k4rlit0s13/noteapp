@@ -85,9 +85,11 @@ body {
 .login-button {
   background-color: white;
   color: black;
+  text-decoration: none;
 }
 
 .signup-button {
   background-color: black;
   color: white;
-}</style>
+}
+</style>
