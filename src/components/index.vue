@@ -7,8 +7,8 @@
       <div class="title">NOTES</div>
       <input type="text" class="input-field" placeholder="Email">
       <input type="password" class="input-field" placeholder="Password">
-      <button class="button login-button">login</button>
-      <button class="button signup-button">sign up</button>
+      <button class="button signup-button">login</button>
+      <a class="button login-button" href="../views/signup.html">sign up</a>
     </div>
   </body>
 </template>
