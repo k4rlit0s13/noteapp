@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.BACKEND_PORT || 5000; // Cambia el puerto por defecto si no está en .env
+const PORT = process.env.BACKEND_PORT; // Cambia el puerto por defecto si no está en .env
+const PORT2 = process.env.FRONTEND_PORT; // Cambia el puerto por defecto si no está en .env
 
 // Obtener __dirname usando import.meta.url
 const __filename = fileURLToPath(import.meta.url);
@@ -21,11 +22,15 @@ app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conectado a MongoDB'))
-  .catch(err => console.error('Error de conexión a MongoDB:', err));
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// Tu código para rutas y lógica adicional aquí
+// Ruta de prueba de API
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'Backend is working!' });
+});
 
+// Escucha el puerto
 app.listen(PORT, () => {
-  console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
+  console.log(`Frontend running at http://localhost:${PORT2}`);
+  console.log(`Backend ready at http://localhost:${PORT}/api/test`);
 });

@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "vite",
-    "dev:all": "concurrently \"npm start\" \"npm run dev\""
+    "dev": "vite --clearScreen false > /dev/null 2>&1",
+    "dev:all": "concurrently --raw \"npm start\" \"npm run dev\""
   },
   "dependencies": {
     "cors": "^2.8.5",
