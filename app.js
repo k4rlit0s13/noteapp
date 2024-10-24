@@ -1,9 +1,9 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
+import connectDB from './server/db/connectmongo/connect.js'; // Importa la función de conexión
 
 dotenv.config();
 
@@ -21,15 +21,13 @@ app.use(express.json()); // Para parsear el cuerpo de las peticiones como JSON
 app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos
 
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .catch(err => console.error('MongoDB connection error:', err));
+connectDB(); // Conecta a MongoDB
 
 // Ruta de prueba de API
 app.get('/api/test', (req, res) => {
   res.status(200).json({ message: 'Backend is working!' });
 });
 
-// Escucha el puerto
 app.listen(PORT, () => {
   console.log(`Frontend running at http://localhost:${PORT2}`);
   console.log(`Backend ready at http://localhost:${PORT}/api/test`);

@@ -6,7 +6,11 @@ mongodb+srv://kadavzu:carlos123@clustercarlos.qb1yv8u.mongodb.net/
 
 
 .env:
-PORT=3000
+FRONTEND_PORT=3000
+BACKEND_PORT=5000
+MONGODB_URI=mongodb://root:campus2023@localhost:27017/
+MONGODB_DB_NAME=noteappdb
+
 
 
 dependencias: instalar una a una preferiblemente
