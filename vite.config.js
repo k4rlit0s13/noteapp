@@ -8,6 +8,6 @@ export default defineConfig({
   plugins: [vue()],
   root: 'src',
   server: {
-    port: (process.env.PORT), // Asegurarse de que sea un número
+    port: process.env.FRONTEND_PORT || 3000,
   },
 });

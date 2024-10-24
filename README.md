@@ -11,12 +11,15 @@ PORT=3000
 
 dependencias: instalar una a una preferiblemente
 
-npm i vue
-npm i dotenv
-npm i express
-npm i vite --save-dev
-npm i @vitejs/plugin-vue --save-dev
-npm i concurrently --save-dev
+npm install vue
+npm install cors
+npm install dotenv
+npm install express
+npm install mongodb
+npm install mongoose
+npm install vite --save-dev
+npm install @vitejs/plugin-vue --save-dev
+npm install concurrently --save-dev
 
 
 correr:
