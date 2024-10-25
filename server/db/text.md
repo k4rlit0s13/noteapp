@@ -71,21 +71,45 @@ erDiagram
 NOTEAPP
 ├── node_modules
 ├── server
-│   └── router
-│      
+│   ├── controllers
+│   │   ├── controllers.js
+│   │   └── usercontroller.js
+│   ├── db
+│   │   ├── connectmongo
+│   │   │   └── connect.js
+│   │   ├── data.sql
+│   │   ├── estructure.sql
+│   │   └── queries.sql
+│   ├── routes
+│   │   └── userrouter.js
+│   ├── versions
+│   │   └── version.js
+│   └── text.md
 ├── src
 │   ├── components
+│   │   ├── home.vue
 │   │   ├── index.vue
-│   │   └── home.vue
+│   │   └── signup.vue
 │   ├── js
+│   │   ├── home.js
 │   │   ├── main.js
-│   │   └── home.js
-│   └── views
-│       ├── index.html
-│       └── home.html
+│   │   └── signup.js
+│   ├── storage
+│   │   ├── font
+│   │   └── img
+│   ├── views
+│   │    ├── home.html
+│   │    └── signup.html
+│   └── index.html
+├── .env
 ├── .gitignore
 ├── app.js
-├── .env
+├── certificate.crt
+├── certificate.csr
 ├── package-lock.json
 ├── package.json
-└── vite.config.js 
+├── private.key
+├── README.md
+└── vite.config.js
+
+

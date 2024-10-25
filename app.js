@@ -1,9 +1,13 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import cors from 'cors';
+import connectDB from './server/db/connectmongo/connect.js'; // Importa la función de conexión
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import dotenv from 'dotenv';
-import connectDB from './server/db/connectmongo/connect.js'; // Importa la función de conexión
+import apiV1 from './server/versions/version.js';
+import https from 'https'; // Importa el módulo https
+import fs from 'fs'; // Importa el módulo fs para leer archivos
+import { createServer } from 'http';
 
 dotenv.config();
 
@@ -20,6 +24,9 @@ app.use(cors()); // Habilita CORS
 app.use(express.json()); // Para parsear el cuerpo de las peticiones como JSON
 app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos
 
+// Configurar las APIs
+app.use('/api/v1', apiV1);
+
 // Conexión a MongoDB
 connectDB(); // Conecta a MongoDB
 
@@ -28,7 +35,18 @@ app.get('/api/test', (req, res) => {
   res.status(200).json({ message: 'Backend is working!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Frontend running at http://localhost:${PORT2}`);
-  console.log(`Backend ready at http://localhost:${PORT}/api/test`);
+// Configura las opciones del servidor HTTPS
+const options = {
+  key: fs.readFileSync(join(__dirname, 'private.key')), // Ruta al archivo de la clave privada
+  cert: fs.readFileSync(join(__dirname, 'certificate.crt')), // Ruta al archivo del certificado
+  // Si necesitas usar el CSR, normalmente se usa para generar el certificado, no se incluye aquí.
+};
+
+// Crea un servidor HTTPS
+const server = https.createServer(options, app);
+
+// Inicia el servidor
+server.listen(PORT, () => {
+  console.log(`Frontend running at https://localhost:${PORT2}`);
+  console.log(`Backend ready at https://localhost:${PORT}/api/test`);
 });
