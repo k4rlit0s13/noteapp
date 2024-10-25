@@ -7,7 +7,6 @@ import { dirname, join } from 'path';
 import apiV1 from './server/versions/version.js';
 import https from 'https'; // Importa el módulo https
 import fs from 'fs'; // Importa el módulo fs para leer archivos
-import { createServer } from 'http';
 
 dotenv.config();
 
@@ -24,11 +23,11 @@ app.use(cors()); // Habilita CORS
 app.use(express.json()); // Para parsear el cuerpo de las peticiones como JSON
 app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos
 
-// Configurar las APIs
-app.use('/api/v1', apiV1);
-
 // Conexión a MongoDB
 connectDB(); // Conecta a MongoDB
+
+// Configurar las APIs
+app.use('/api/v1', apiV1);
 
 // Ruta de prueba de API
 app.get('/api/test', (req, res) => {
@@ -39,7 +38,6 @@ app.get('/api/test', (req, res) => {
 const options = {
   key: fs.readFileSync(join(__dirname, 'private.key')), // Ruta al archivo de la clave privada
   cert: fs.readFileSync(join(__dirname, 'certificate.crt')), // Ruta al archivo del certificado
-  // Si necesitas usar el CSR, normalmente se usa para generar el certificado, no se incluye aquí.
 };
 
 // Crea un servidor HTTPS

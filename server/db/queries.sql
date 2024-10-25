@@ -39,8 +39,8 @@ db.NOTE.insertOne({
   userId: ObjectId(carlosId),  
   title: "Título de la Nota",
   content: "Contenido de la nota.",
-  createdAt: new Date("2023-01-01T10:00:00"),  
-  updatedAt: new Date("2023-01-01T10:00:00") 
+  createdAt: new Date("2023-01-01T10:00:00"), //fecha y hora actuales dinamicas 
+  updatedAt: new Date("2023-01-01T10:00:00") //fecha y hora actuales dinamicas 
 });
 ```
 
