@@ -95,9 +95,24 @@ db.createCollection("HISTORY", {
         previousContent: {
           bsonType: "array",
           items: {
-            bsonType: "string"
+            bsonType: "object",
+            required: ["title", "content", "updatedAt"],
+            properties: {
+              title: {
+                bsonType: "string",
+                description: "Previous title of the note"
+              },
+              content: {
+                bsonType: "string",
+                description: "Previous content of the note"
+              },
+              updatedAt: {
+                bsonType: "date",
+                description: "Previous update date of the note"
+              }
+            }
           },
-          description: "Array of previous content versions of the note"
+          description: "Array of previous content versions of the note, including title, content, and update date"
         },
         newContent: {
           bsonType: "string",

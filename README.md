@@ -51,10 +51,11 @@ npm run dev
 Create User
 
 ### Endpoint
-```
-POST /api/v1/users/createuser
-```
-## https://localhost:5000/api/v1/users/createuser
+
+https://localhost:5000/api/v1/users/createuser
+
+**Método:** `POST`  
+**Ruta:** `/api/v1/notes/createuser`  
 
 ### Description
 Este endpoint permite crear un nuevo usuario en la base de datos. Al crear un usuario, se genera un token JWT que se devuelve en la respuesta. Este token puede ser utilizado para autenticación en futuras solicitudes.
@@ -132,4 +133,140 @@ Debes enviar un JSON con los siguientes campos:
 ### Notes
 - Asegúrate de que los campos `username` y `email` sean únicos al intentar crear un nuevo usuario.
 - El token JWT se utiliza para autenticar al usuario en futuras solicitudes a la API.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1. Crear Nota (createNote)
+
+https://localhost:5000/api/v1/notes/createnote
+
+**Método:** `POST`  
+**Ruta:** `/api/v1/notes/createnote`  
+
+##### Descripción
+Crea una nueva nota y registra el historial de la acción.
+
+##### Parámetros del Cuerpo de la Solicitud
+```json
+{
+  "userId": "ObjectId", // ID del usuario que crea la nota (requerido)
+  "title": "string",    // Título de la nota (requerido)
+  "content": "string"   // Contenido de la nota (requerido)
+}
+```
+
+##### Respuesta Exitosa
+- **Código:** `201 Created`
+- **Cuerpo:**
+```json
+{
+  "message": "Note created successfully",
+  "token": "JWT_TOKEN" // Token JWT generado para la nueva nota
+}
+```
+
+##### Respuestas de Error
+- **Código:** `400 Bad Request`
+  - **Cuerpo:**
+  ```json
+  {
+    "error": "User ID, title, and content are required"
+  }
+  ```
+
+- **Código:** `404 Not Found`
+  - **Cuerpo:**
+  ```json
+  {
+    "error": "User not found"
+  }
+  ```
+
+- **Código:** `500 Internal Server Error`
+  - **Cuerpo:**
+  ```json
+  {
+    "message": "Error al crear la nota"
+  }
+  ```
+
+---
+
+#### 2. Actualizar Nota (updateNote)
+
+https://localhost:5000/api/v1/notes/updatenote
+
+**Método:** `PUT`  
+**Ruta:** `/api/v1/notes/updatenote`  
+
+##### Descripción
+Actualiza una nota existente y registra el historial de la acción.
+
+##### Parámetros del Cuerpo de la Solicitud
+```json
+{
+  "noteId": "ObjectId", // ID de la nota a actualizar (requerido)
+  "userId": "ObjectId", // ID del usuario que realiza la actualización (requerido)
+  "title": "string",     // Título de la nota (opcional)
+  "content": "string"    // Contenido de la nota (opcional)
+}
+```
+
+##### Respuesta Exitosa
+- **Código:** `200 OK`
+- **Cuerpo:**
+```json
+{
+  "message": "Note updated successfully",
+  "token": "JWT_TOKEN" // Token JWT generado para la nota actualizada
+}
+```
+
+##### Respuestas de Error
+- **Código:** `400 Bad Request`
+  - **Cuerpo:**
+  ```json
+  {
+    "error": "Note ID and User ID are required"
+  }
+  ```
+
+- **Código:** `404 Not Found`
+  - **Cuerpo:**
+  ```json
+  {
+    "error": "Note not found"
+  }
+  ```
+
+- **Código:** `500 Internal Server Error`
+  - **Cuerpo:**
+  ```json
+  {
+    "message": "Error updating note"
+  }
+  ```
+
+---
+
+Si necesitas más modificaciones o información, ¡avísame!
 
