@@ -40,6 +40,8 @@ npm install @vitejs/plugin-vue --save-dev
 npm install concurrently --save-dev
 npm install jsonwebtoken
 npm install https fs
+npm install cross-env --save-dev
+npm install bcrypt
 
 
 correr:
