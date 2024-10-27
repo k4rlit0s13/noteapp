@@ -10,12 +10,14 @@
 
         <div class="container">
             <div class="content" v-if="!notes.length">
-                <img alt="Illustration of a person standing next to a large notepad and pencil" src="../storage/img/note.svg" />
+                <img alt="Illustration of a person standing next to a large notepad and pencil"
+                    src="../storage/img/note.svg" />
                 <p>Create your first note!</p>
             </div>
 
             <div class="notes-list" v-if="notes.length">
-                <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }" @click="openModal(note)">
+                <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }"
+                    @click="openModal(note)">
                     <h2>{{ note.title }}</h2>
                     <p>{{ truncateContent(note.content) }}</p>
                 </div>
@@ -52,7 +54,24 @@
             </div>
         </div>
 
-        <div class="add-note" @click="addNote">
+        <!-- Modal for creating a new note -->
+        <div class="modal" v-if="isCreateModalVisible">
+            <div class="modal-content">
+                <div class="header">
+                    <i class="fas fa-arrow-left" @click="closeCreateModal"></i>
+                    <h2>Create a New Note</h2>
+                </div>
+                <div class="content">
+                    <input type="text" v-model="newNote.title" class="title-input" placeholder="Note Title" />
+                    <textarea v-model="newNote.content" placeholder="Content"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="save-button" @click="createNote">Create Note</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="add-note" @click="openCreateModal">
             <i class="fas fa-plus"></i>
         </div>
     </div>
@@ -67,6 +86,8 @@ export default {
             isModalVisible: false,
             selectedNote: { title: '', content: '', _id: '' },
             showSaveModal: false,
+            isCreateModalVisible: false,
+            newNote: { title: '', content: '' },
         };
     },
     mounted() {
@@ -142,12 +163,52 @@ export default {
                 console.error('Error updating note:', error);
             }
         },
+        openCreateModal() {
+            this.isCreateModalVisible = true;
+            this.newNote = { title: '', content: '' }; // Reset fields
+        },
+        closeCreateModal() {
+            this.isCreateModalVisible = false;
+        },
+        async createNote() {
+            if (!this.newNote.title || !this.newNote.content) {
+                alert('Please fill in both the title and content.');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://localhost:5000/api/v1/notes/createnote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // Asegúrate de incluir esta línea
+                    body: JSON.stringify({
+                        userId: this.getCookie('auth_token'), // Asegúrate de que esto sea correcto
+                        title: this.newNote.title,
+                        content: this.newNote.content,
+                    }),
+                });
+                if (response.ok) {
+                    const newNote = await response.json();
+                    this.notes.push(newNote);
+                    this.closeCreateModal();
+                    this.fetchUserNotes(); // Refresh the notes list
+                } else {
+                    console.error('Error creating note:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error creating note:', error);
+            }
+        }
+        ,
         addNote() {
             console.log('Add Note clicked');
         },
     },
 };
 </script>
+
 
 <style>
 body {
@@ -226,7 +287,8 @@ body {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar contenido */
+    align-items: center;
+    /* Centrar contenido */
 }
 
 .header {
@@ -247,7 +309,8 @@ body {
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar título y contenido */
+    align-items: center;
+    /* Centrar título y contenido */
 }
 
 .title-input {
@@ -281,13 +344,15 @@ body {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #2db64f; /* Cambiar color de fondo */
+    background-color: #2db64f;
+    /* Cambiar color de fondo */
     color: white;
     cursor: pointer;
 }
 
 .modal-actions button:hover {
-    background-color: #248d3e; /* Color al pasar el ratón */
+    background-color: #248d3e;
+    /* Color al pasar el ratón */
 }
 
 .add-note {
@@ -358,18 +423,22 @@ body {
 }
 
 .buttons .discard {
-    background-color: #dc3545; /* Color de fondo para el botón de descartar */
+    background-color: #dc3545;
+    /* Color de fondo para el botón de descartar */
 }
 
 .buttons .save {
-    background-color: #38b64d; /* Color de fondo para el botón de guardar */
+    background-color: #38b64d;
+    /* Color de fondo para el botón de guardar */
 }
 
 .buttons .discard:hover {
-    background-color: #c82333; /* Color al pasar el ratón */
+    background-color: #c82333;
+    /* Color al pasar el ratón */
 }
 
 .buttons .save:hover {
-    background-color: #309941; /* Color al pasar el ratón */
+    background-color: #309941;
+    /* Color al pasar el ratón */
 }
 </style>

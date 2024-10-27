@@ -43,23 +43,35 @@ const historySchema = new mongoose.Schema({
 const History = mongoose.model('History', historySchema);
 
 class NoteController {
-  // Método para crear una nota y registrar el historial
+
+
   async create(req, res) {
     try {
-      const { userId, title, content } = req.body;
+      const token = req.cookies.auth_token;
 
-      if (!userId || !title || !content) {
-        return res.status(400).json({ error: 'User ID, title, and content are required' });
+      if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
       }
 
-      const userExists = await mongoose.model('USER').findById(userId);
-      if (!userExists) {
+      // Decodificar el token para obtener el correo
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userEmail = decoded.email; // Obtener el correo del token
+
+      // Buscar el usuario por correo y obtener su _id
+      const user = await mongoose.model('USER').findOne({ email: userEmail });
+      if (!user) {
         return res.status(404).json({ error: 'User not found' });
+      }
+
+      const { title, content } = req.body;
+
+      if (!title || !content) {
+        return res.status(400).json({ error: 'Title and content are required' });
       }
 
       // Crear la nueva nota
       const newNote = new Note({
-        userId: mongoose.Types.ObjectId(userId),
+        userId: user._id, // Usar el _id del usuario encontrado
         title,
         content,
       });
@@ -69,7 +81,7 @@ class NoteController {
       // Crear el historial de creación
       const historyData = {
         noteId: newNote._id,
-        userId: mongoose.Types.ObjectId(userId),
+        userId: user._id,
         action: 'created',
         timestamp: new Date(),
         previousContent: [],
@@ -80,7 +92,7 @@ class NoteController {
       await historyEntry.save();
 
       // Generar el token JWT
-      const token = jwt.sign({
+      const tokenResponse = jwt.sign({
         _id: newNote._id,
         userId: newNote.userId,
         title: newNote.title,
@@ -91,7 +103,7 @@ class NoteController {
 
       return res.status(201).json({
         message: 'Note created successfully',
-        token
+        token: tokenResponse
       });
     } catch (error) {
       console.error('Error creating note:', error);
@@ -169,7 +181,7 @@ class NoteController {
         content: note.content,
         createdAt: note.createdAt,
         updatedAt: note.updatedAt
-      }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      }, process.env.JWT_SECRET);
   
       // Retornar el mensaje y el token
       return res.status(200).json({ 
@@ -211,7 +223,7 @@ class NoteController {
       }
     }
 
-    
+
 }
 
 export default new NoteController();

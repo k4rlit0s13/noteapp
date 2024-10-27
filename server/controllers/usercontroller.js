@@ -111,9 +111,7 @@ class UserController {
             if (!isPasswordValid) return res.status(401).json({ error: 'Invalid password' });
 
             // Generar un token JWT para el usuario encontrado
-            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-                expiresIn: '1h',
-            });
+            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET);
             
             res.cookie('auth_token', token); // Sin httpOnly y secure para pruebas
 
