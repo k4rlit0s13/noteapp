@@ -1,70 +1,78 @@
 <template>
     <div>
         <div class="header">
-            <h1 v-if="!isSearchVisible || windowWidth > 600">Notes</h1>
-            <div class="search-container" v-if="isSearchVisible">
-                <input type="text" class="search-input" placeholder="Search by keyword..." v-model="searchTerm"
-                    @input="filterNotes" />
-                <i class="fas fa-times search-icon" @click="toggleSearchVisibility"></i>
+            <h1>Notes</h1>
+            <div class="icons">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-info-circle"></i>
             </div>
-            <i class="fas fa-search" @click="toggleSearchVisibility" v-if="!isSearchVisible"></i>
         </div>
 
         <div class="container">
-            <div class="notes-list" v-if="filteredNotes.length">
-                <div class="note" v-for="note in filteredNotes" :key="note._id"
-                    :style="{ backgroundColor: getRandomColor() }" @click="openModal(note)">
+            <div class="content" v-if="!notes.length">
+                <img alt="Illustration of a person standing next to a large notepad and pencil"
+                    src="../storage/img/note.svg" />
+                <p>Create your first note!</p>
+            </div>
+
+            <div class="notes-list" v-if="notes.length">
+                <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }"
+                    @click="openModal(note)">
                     <h2>{{ note.title }}</h2>
                     <p>{{ truncateContent(note.content) }}</p>
                 </div>
             </div>
+        </div>
 
-            <div class="no-results" v-if="!hasResults && searchTerm">
-                <div class="image-container">
-                    <img alt="No results found" height="200"
-                        src="../storage/img/notfound.svg"
-                        width="300" />
-                    <div class="message">
-                        No results found. Try searching again.
-                    </div>
+        <!-- Modal for editing note -->
+        <div class="modal" v-if="isModalVisible">
+            <div class="modal-content">
+                <div class="header">
+                    <i class="fas fa-arrow-left" @click="closeModal"></i>
+                </div>
+                <div class="content">
+                    <input type="text" v-model="selectedNote.title" class="title-input" placeholder="Note Title" />
+                    <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="save-button" @click="showSaveModal = true">Save Changes</button>
                 </div>
             </div>
+        </div>
 
-            <div class="content" v-if="!notes.length && !isSearchVisible">
-                <img alt="Illustration of a person standing next to a large notepad and pencil"
-                    src="../storage/img/note.svg" />
-                <p>Create your first note!</p>
+        <!-- Confirmation modal for saving changes -->
+        <div class="modal" v-if="showSaveModal">
+            <div class="modal-content">
+                <div class="icon-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Save changes?</p>
+                </div>
+                <div class="buttons">
+                    <button class="discard" @click="showSaveModal = false">Discard</button>
+                    <button class="save" @click="confirmSave">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for creating a new note -->
+        <div class="modal" v-if="isCreateModalVisible">
+            <div class="modal-content">
+                <div class="header">
+                    <i class="fas fa-arrow-left" @click="closeCreateModal"></i>
+                    <h2>Create a New Note</h2>
+                </div>
+                <div class="content">
+                    <input type="text" v-model="newNote.title" class="title-input" placeholder="Note Title" />
+                    <textarea v-model="newNote.content" placeholder="Content"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="save-button" @click="createNote">Create Note</button>
+                </div>
             </div>
         </div>
 
         <div class="add-note" @click="openCreateModal">
             <i class="fas fa-plus"></i>
-        </div>
-
-        <!-- Modal to view/edit a note -->
-        <div class="modal" v-if="isModalVisible">
-            <div class="modal-content">
-                <h2>Edit Note</h2>
-                <input type="text" v-model="selectedNote.title" class="title-input" placeholder="Note Title">
-                <textarea v-model="selectedNote.content" placeholder="Content" rows="4"></textarea>
-                <div class="modal-actions">
-                    <button @click="confirmSave">Save</button>
-                    <button @click="closeModal">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal to create a new note -->
-        <div class="modal" v-if="isCreateModalVisible">
-            <div class="modal-content">
-                <h2>Create Note</h2>
-                <input type="text" v-model="newNote.title" class="title-input" placeholder="Note Title">
-                <textarea v-model="newNote.content" placeholder="Content" rows="4"></textarea>
-                <div class="modal-actions">
-                    <button @click="createNote">Create</button>
-                    <button @click="closeCreateModal">Cancel</button>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -75,18 +83,14 @@ export default {
     data() {
         return {
             notes: [],
-            filteredNotes: [],
-            searchTerm: '',
-            isSearchVisible: false,
             isModalVisible: false,
             selectedNote: { title: '', content: '', _id: '' },
+            showSaveModal: false,
             isCreateModalVisible: false,
             newNote: { title: '', content: '' },
-            windowWidth: window.innerWidth,
         };
     },
     mounted() {
-        window.addEventListener('resize', this.handleResize);
         const token = this.getCookie('auth_token');
         if (!token) {
             window.location.href = '../views/index.html';
@@ -94,13 +98,7 @@ export default {
             this.fetchUserNotes();
         }
     },
-    beforeUnmount() {
-        window.removeEventListener('resize', this.handleResize);
-    },
     methods: {
-        handleResize() {
-            this.windowWidth = window.innerWidth;
-        },
         getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -114,7 +112,6 @@ export default {
                 });
                 if (response.ok) {
                     this.notes = await response.json();
-                    this.filteredNotes = this.notes;
                 } else {
                     console.error('Error fetching notes:', response.statusText);
                 }
@@ -138,7 +135,7 @@ export default {
         },
         async confirmSave() {
             await this.updateNote();
-            this.isModalVisible = false;
+            this.showSaveModal = false;
         },
         async updateNote() {
             try {
@@ -149,17 +146,16 @@ export default {
                     },
                     body: JSON.stringify({
                         noteId: this.selectedNote._id,
+                        userId: this.getCookie('auth_token'),
                         title: this.selectedNote.title,
                         content: this.selectedNote.content,
                     }),
                 });
                 if (response.ok) {
                     this.notes = this.notes.map(note =>
-                        note._id === this.selectedNote._id
-                            ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title }
-                            : note
+                        note._id === this.selectedNote._id ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title } : note
                     );
-                    this.fetchUserNotes();
+                    this.closeModal();
                 } else {
                     console.error('Error updating note:', response.statusText);
                 }
@@ -169,6 +165,7 @@ export default {
         },
         openCreateModal() {
             this.isCreateModalVisible = true;
+            this.newNote = { title: '', content: '' }; // Reset fields
         },
         closeCreateModal() {
             this.isCreateModalVisible = false;
@@ -185,47 +182,32 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include',
-                    body: JSON.stringify(this.newNote),
+                    credentials: 'include', // Asegúrate de incluir esta línea
+                    body: JSON.stringify({
+                        userId: this.getCookie('auth_token'), // Asegúrate de que esto sea correcto
+                        title: this.newNote.title,
+                        content: this.newNote.content,
+                    }),
                 });
                 if (response.ok) {
                     const newNote = await response.json();
                     this.notes.push(newNote);
                     this.closeCreateModal();
-                    this.fetchUserNotes();
+                    this.fetchUserNotes(); // Refresh the notes list
                 } else {
                     console.error('Error creating note:', response.statusText);
                 }
             } catch (error) {
                 console.error('Error creating note:', error);
             }
-        },
-        filterNotes() {
-            if (!this.searchTerm) {
-                this.filteredNotes = this.notes;
-                return;
-            }
-
-            const term = this.searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            this.filteredNotes = this.notes.filter(note =>
-                note.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(term)
-            );
-        },
-        toggleSearchVisibility() {
-            this.isSearchVisible = !this.isSearchVisible;
-            if (!this.isSearchVisible) {
-                this.filteredNotes = this.notes;
-            }
         }
+        ,
+        addNote() {
+            console.log('Add Note clicked');
+        },
     },
-    computed: {
-        hasResults() {
-            return this.filteredNotes.length > 0;
-        }
-    }
 };
 </script>
-
 
 
 <style>
@@ -388,49 +370,6 @@ body {
     font-size: 24px;
     cursor: pointer;
 }
-
-.search-container {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 40px 10px 20px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    background-color: #333;
-    color: #ccc;
-}
-
-.search-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #ccc;
-    cursor: pointer;
-}
-
-.image-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1;
-}
-
-.message {
-    font-size: 16px;
-    margin-top: 20px;
-    text-align: center;
-}
-
-
 
 /* Media queries */
 @media (max-width: 600px) {
