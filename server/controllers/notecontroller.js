@@ -182,7 +182,36 @@ class NoteController {
     }
   }
 
+    // Método para obtener notas del usuario a partir del token JWT
+    async getUserNotes(req, res) {
+      try {
+        const token = req.cookies.auth_token;
   
+        if (!token) {
+          return res.status(401).json({ error: 'No token provided' });
+        }
+  
+        // Decodificar el token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userEmail = decoded.email; // Obtener el correo del token
+  
+        // Paso 1: Buscar el usuario por correo y obtener su _id
+        const user = await mongoose.model('USER').findOne({ email: userEmail });
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+  
+        // Paso 2: Usar el ID del usuario para buscar todas las notas asociadas en la colección NOTE
+        const notes = await Note.find({ userId: user._id });
+  
+        return res.status(200).json(notes);
+      } catch (error) {
+        console.error('Error al obtener las notas del usuario:', error);
+        return res.status(500).json({ error: 'Error fetching user notes' });
+      }
+    }
+
+    
 }
 
 export default new NoteController();

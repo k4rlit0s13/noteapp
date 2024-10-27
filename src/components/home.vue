@@ -1,5 +1,4 @@
 <template>
-
     <body>
         <div class="header">
             <h1>Notes</h1>
@@ -8,12 +7,21 @@
                 <i class="fas fa-info-circle"></i>
             </div>
         </div>
-        <div class="content">
+        
+        <div class="content" v-if="!notes.length">
             <img alt="Illustration of a person standing next to a large notepad and pencil"
                 src="../storage/img/note.svg" />
-            <p>Create your first note !</p>
+            <p>Create your first note!</p>
         </div>
-        <div class="add-note">
+        
+        <div class="notes-list" v-if="notes.length">
+            <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }">
+                <h2>{{ note.title }}</h2>
+                <p>{{ truncateContent(note.content) }}</p>
+            </div>
+        </div>
+        
+        <div class="add-note" @click="addNote">
             <i class="fas fa-plus"></i>
         </div>
     </body>
@@ -22,14 +30,19 @@
 <script>
 export default {
     name: 'home',
+    data() {
+        return {
+            notes: [], // Arreglo para almacenar las notas
+        };
+    },
     mounted() {
-        const cookies = document.cookie.split('; ');
-        console.log('All cookies:', cookies); // Imprime todas las cookies
         const token = this.getCookie('auth_token');
-        console.log('Token found:', token); // Verifica el valor del token
+        console.log('Token found:', token);
         if (!token) {
             console.log('No token found, redirecting to index.html');
             window.location.href = '../views/index.html';
+        } else {
+            this.fetchUserNotes(); // Llama a la función para obtener notas
         }
     },
     methods: {
@@ -39,15 +52,42 @@ export default {
             if (parts.length === 2) return parts.pop().split(';').shift();
             return null; // Retorna null si no se encuentra
         },
-    }
-
+        async fetchUserNotes() {
+            try {
+                const response = await fetch('https://localhost:5000/api/v1/notes/getUserNotes', {
+                    method: 'GET',
+                    credentials: 'include', // Incluir cookies en la solicitud
+                });
+                if (response.ok) {
+                    this.notes = await response.json(); // Guardar las notas en el estado
+                } else {
+                    console.error('Error fetching notes:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching notes:', error);
+            }
+        },
+        truncateContent(content) {
+            return content.length > 30 ? content.slice(0, 30) + '...' : content; // Truncar el contenido si es muy largo
+        },
+        getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color; // Generar color aleatorio
+        },
+        addNote() {
+            // Aquí puedes manejar la lógica para agregar una nueva nota
+            console.log('Add Note clicked');
+        },
+    },
 };
 </script>
 
-
-
-
 <style>
+/* Aquí puedes mantener tus estilos existentes o agregar nuevos según lo necesites */
 body {
     margin: 0;
     padding: 0;
@@ -93,19 +133,23 @@ body {
 
 .content {
     text-align: center;
-    margin-top: 100px;
-    /* Add margin to avoid content being hidden behind the fixed header */
+    margin-top: 100px; /* Evitar que el contenido se esconda detrás del encabezado fijo */
 }
 
-.content img {
-    width: 100%;
-    /* Adjust the width to make the image larger */
-    height: auto;
-    margin-bottom: 20px;
+.notes-list {
+    margin-top: 100px; /* Ajustar margen para el contenido */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.content p {
-    font-size: 1.2em;
+.note {
+    background-color: #3a3a3a; /* Color de fondo predeterminado */
+    margin: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    width: 80%;
+    transition: background-color 0.3s;
 }
 
 .add-note {

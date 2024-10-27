@@ -65,7 +65,7 @@ esta no funciona en testeo de api debido a sus diferentes dependencias con el fr
 
 find notes
 
-https://localhost:5000/api/v1/notes/searchAll
+https://localhost:5000/api/v1/notes/getUserNotes 
 
 no funciona en normal, es neseario una cookie que se crea al logear en el navegador
 

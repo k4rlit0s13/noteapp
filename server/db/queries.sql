@@ -49,7 +49,23 @@ Método HTTP: GET
 Endpoint: `/notes`  
 Descripción: Obtiene una lista de todas las notas.  
 ```plaintext
+// Paso 1: Obtener el correo del usuario deseado
+const userEmail = "karlitos@gmail.com"; // Reemplaza con el correo del usuario que buscas
 
+// Paso 2: Buscar el usuario por correo y obtener su _id
+const user = db.USER.findOne({ email: userEmail });
+
+if (user) {
+    const userId = user._id;
+
+    // Paso 3: Usar el ID del usuario para buscar todas las notas asociadas en la colección NOTE
+    const notes = db.NOTE.find({ userId: userId });
+    
+    // Mostrar las notas encontradas
+    print(notes); // o cualquier otra forma de manejar los datos
+} else {
+    print("Usuario no encontrado");
+}
 ```
 
 **Obtener Nota Específica**  
