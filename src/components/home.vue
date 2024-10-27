@@ -26,11 +26,16 @@
         <!-- Modal for editing note -->
         <div class="modal" v-if="isModalVisible">
             <div class="modal-content">
-                <span class="close" @click="closeModal">&times;</span>
-                <h2>Edit Note</h2>
-                <input v-model="selectedNote.title" placeholder="Title" />
-                <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
-                <button @click="updateNote">Save Changes</button>
+                <div class="header">
+                    <i class="fas fa-arrow-left" @click="closeModal"></i>
+                </div>
+                <div class="content">
+                    <input type="text" v-model="selectedNote.title" class="title-input" placeholder="Note Title" />
+                    <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button @click="confirmSave">Save Changes</button>
+                </div>
             </div>
         </div>
 
@@ -45,9 +50,10 @@ export default {
     name: 'home',
     data() {
         return {
-            notes: [], // Array to store notes
-            isModalVisible: false, // Controls modal visibility
-            selectedNote: { title: '', content: '', _id: '' }, // Selected note
+            notes: [],
+            isModalVisible: false,
+            selectedNote: { title: '', content: '', _id: '' },
+            showSaveModal: false,
         };
     },
     mounted() {
@@ -55,23 +61,23 @@ export default {
         if (!token) {
             window.location.href = '../views/index.html';
         } else {
-            this.fetchUserNotes(); // Fetch user notes
+            this.fetchUserNotes();
         }
     },
     methods: {
         getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
-            return parts.length === 2 ? parts.pop().split(';').shift() : null; // Return null if not found
+            return parts.length === 2 ? parts.pop().split(';').shift() : null;
         },
         async fetchUserNotes() {
             try {
                 const response = await fetch('https://localhost:5000/api/v1/notes/getUserNotes', {
                     method: 'GET',
-                    credentials: 'include', // Include cookies in request
+                    credentials: 'include',
                 });
                 if (response.ok) {
-                    this.notes = await response.json(); // Store notes in state
+                    this.notes = await response.json();
                 } else {
                     console.error('Error fetching notes:', response.statusText);
                 }
@@ -80,18 +86,22 @@ export default {
             }
         },
         truncateContent(content) {
-            return content.length > 30 ? content.slice(0, 30) + '...' : content; // Truncate content if long
+            return content.length > 30 ? content.slice(0, 30) + '...' : content;
         },
         getRandomColor() {
             const colors = ['#ffb6c1', '#ffcccb', '#90ee90', '#ffffe0', '#add8e6'];
-            return colors[Math.floor(Math.random() * colors.length)]; // Randomly select color from array
+            return colors[Math.floor(Math.random() * colors.length)];
         },
         openModal(note) {
-            this.selectedNote = { ...note }; // Clone selected note
-            this.isModalVisible = true; // Show modal
+            this.selectedNote = { ...note };
+            this.isModalVisible = true;
         },
         closeModal() {
-            this.isModalVisible = false; // Close modal
+            this.isModalVisible = false;
+        },
+        async confirmSave() {
+            this.showSaveModal = true;
+            await this.updateNote();
         },
         async updateNote() {
             try {
@@ -102,16 +112,16 @@ export default {
                     },
                     body: JSON.stringify({
                         noteId: this.selectedNote._id,
-                        userId: this.getCookie('auth_token'), // Ensure userId is correctly obtained
+                        userId: this.getCookie('auth_token'),
                         title: this.selectedNote.title,
                         content: this.selectedNote.content,
                     }),
                 });
                 if (response.ok) {
                     this.notes = this.notes.map(note =>
-                        note._id === this.selectedNote._id ? { ...note, title: this.selectedNote.title, content: this.selectedNote.content } : note
+                        note._id === this.selectedNote._id ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title } : note
                     );
-                    this.closeModal(); // Close modal after update
+                    this.closeModal();
                 } else {
                     console.error('Error updating note:', response.statusText);
                 }
@@ -166,21 +176,19 @@ body {
 
 .notes-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Cambiado a un mínimo de 150px */
-    gap: 15px; /* Espaciado aumentado entre notas */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
 }
 
-/* Cambios en la nota para que tenga un margen interno */
 .note {
     padding: 15px;
     border-radius: 10px;
     color: black;
     text-align: center;
-    cursor: pointer; /* Indicate clickable */
-    margin: 5px; /* Añadido margen entre las notas */
+    cursor: pointer;
+    margin: 5px;
 }
 
-/* Modal styles */
 .modal {
     display: flex;
     position: fixed;
@@ -191,6 +199,8 @@ body {
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
@@ -198,50 +208,64 @@ body {
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
 }
 
-.close {
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header i {
+    background-color: #3a3a3a;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 20px;
+}
+
+.content {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4a4a4a;
     color: white;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+    margin-bottom: 10px;
 }
 
-/* Media queries */
-@media (max-width: 600px) {
-    .header h1 {
-        font-size: 1.5em;
-    }
+.content textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4a4a4a;
+    color: white;
+}
 
-    .header .icons i {
-        padding: 8px;
-    }
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
 
-    .content p {
-        font-size: 1em;
-    }
-
-    .add-note {
-        width: 50px;
-        height: 50px;
-    }
-
-    .add-note i {
-        font-size: 1.5em;
-    }
-
-    .notes-list {
-        display: block; /* Cambia a bloque en pantallas pequeñas */
-        padding: 0 10px; /* Añadido padding para que no se salgan del margen */
-    }
-
-    .note {
-        width: calc(100% - 20px); /* Resta el margen */
-        margin: 10px 0; /* Espacio vertical entre notas */
-    }
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3a3a3a;
+    color: white;
+    cursor: pointer;
 }
 
 .add-note {
@@ -258,5 +282,26 @@ body {
     align-items: center;
     font-size: 24px;
     cursor: pointer;
+}
+
+/* Media queries */
+@media (max-width: 600px) {
+    .header h1 {
+        font-size: 1.5em;
+    }
+
+    .header .icons i {
+        padding: 8px;
+    }
+
+    .notes-list {
+        display: block;
+        padding: 0 10px;
+    }
+
+    .note {
+        width: calc(100% - 20px);
+        margin: 10px 0;
+    }
 }
 </style>
