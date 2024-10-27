@@ -58,6 +58,79 @@ class UserController {
             res.status(500).json({ error: 'Error creating user' });
         }
     }
+
+    // Método para buscar un usuario específico por username y email y devolver un token JWT si existe
+    static async findUser(req, res) {
+        try {
+            const { username, email } = req.body;
+
+            // Verificar que los campos no estén vacíos
+            if (!username || !email) {
+                return res.status(400).json({ error: 'Username and email are required' });
+            }
+
+            // Verificar que ambos campos sean cadenas
+            if (typeof username !== 'string' || typeof email !== 'string') {
+                return res.status(400).json({ error: 'Username and email must be strings' });
+            }
+
+            // Buscar el usuario por username y email
+            const user = await User.findOne({ username, email });
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            // Generar un token JWT para el usuario encontrado
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+                expiresIn: '1h',
+            });
+
+            res.status(200).json({ message: 'User found', token });
+        } catch (error) {
+            console.error('Error finding user:', error); // Imprime el error en la consola
+            res.status(500).json({ error: 'Error finding user' });
+        }
+    }
+
+
+    static async authenticateUser(req, res) {
+        try {
+            const { email, password } = req.body;
+    
+            // Verificar que los campos no estén vacíos
+            if (!email || !password) {
+                return res.status(400).json({ error: 'Email and password are required' });
+            }
+    
+            // Buscar el usuario por email
+            const user = await User.findOne({ email });
+            if (!user) return res.status(404).json({ error: 'User not found' });
+    
+            // Comparar la contraseña ingresada con la contraseña encriptada
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) return res.status(401).json({ error: 'Invalid password' });
+    
+            // Generar un token JWT para el usuario encontrado
+            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
+                expiresIn: '1h',
+            });
+    
+            // Establecer la cookie solo con el token JWT
+            res.cookie('auth_token', token, { httpOnly: true, secure: true, sameSite: 'Strict' });
+    
+            // Mensaje de acceso concedido
+            res.status(200).json({ message: 'Access granted' });
+        } catch (error) {
+            console.error('Error during authentication:', error);
+            res.status(500).json({ error: 'Error during authentication' });
+        }
+    }
+    
+    
+
+    
+
+
 }
 
 export default UserController;

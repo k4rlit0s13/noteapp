@@ -1,7 +1,12 @@
 import express from 'express';
 import UserController from '../controllers/usercontroller.js';
 
-const userRouter = express.Router();
-userRouter.post('/createuser', UserController.createUser);
+const router = express.Router();
 
-export default userRouter;
+// Ruta para crear un nuevo usuario
+router.post('/createuser', UserController.createUser);
+
+// Ruta para autenticar un usuario
+router.post('/authenticate', UserController.authenticateUser);
+
+export default router;

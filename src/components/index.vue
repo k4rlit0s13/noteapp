@@ -2,24 +2,58 @@
   <body>
     <div class="container">
       <div class="icon">
-        <img src="../storage/img/noteicon.svg" alt="Icon of a pencil inside a square">
+        <img src="../storage/img/noteicon.svg" alt="Icon of a pencil inside a square" />
       </div>
       <div class="title">NOTES</div>
-      <input type="text" class="input-field" placeholder="Email">
-      <input type="password" class="input-field" placeholder="Password">
-      <button class="button signup-button">login</button>
-      <a class="button login-button" href="../views/signup.html">sign up</a>
+      <input type="text" v-model="email" class="input-field" placeholder="Email" />
+      <input type="password" v-model="password" class="input-field" placeholder="Password" />
+      <button @click="login" class="button signup-button">Login</button>
+      <a class="button login-button" href="../views/signup.html">Sign Up</a>
+      <div v-if="successMessage" class="success">{{ successMessage }}</div>
+      <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
     </div>
   </body>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  name: 'index'
+  name: 'index',
+  data() {
+    return {
+      email: '',
+      password: '',
+      successMessage: '',
+      errorMessage: ''
+    };
+  },
+  methods: {
+    async login() {
+      try {
+        const response = await axios.post('https://localhost:5000/api/v1/users/authenticate', {
+          email: this.email,
+          password: this.password
+        }, { withCredentials: true });
+
+        this.successMessage = response.data.message;
+
+        // Redirigir a la página de inicio después de 2 segundos
+        setTimeout(() => {
+          window.location.href = '../views/home.html'; 
+        }, 2000);
+      } catch (error) {
+        this.errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
+      }
+    }
+  }
 }
 </script>
 
+
+
 <style>
+/* Estilo previo */
 body {
   margin: 0;
   padding: 0;
@@ -39,9 +73,6 @@ body {
   width: 300px;
   padding: 20px;
   box-sizing: border-box;
-}
-
-.icon {
 }
 
 .icon img {
@@ -91,5 +122,15 @@ body {
 .signup-button {
   background-color: black;
   color: white;
+}
+
+.success {
+  color: green;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
 }
 </style>

@@ -42,13 +42,31 @@ npm install jsonwebtoken
 npm install https fs
 npm install cross-env --save-dev
 npm install bcrypt
-
+npm install axios cookiejs
+npm i cookie-parser
 
 correr:
 npm run dev
 
 
 ## API Documentation: 
+
+
+
+find user
+
+https://localhost:5000/api/v1/users/authenticate
+
+
+esta no funciona en testeo de api debido a sus diferentes dependencias con el front y que verifica que la cookie creada contiene los datos y verifica en la db los datos del token y encritpados.
+
+
+
+
+
+
+
+
 
 Create User
 
