@@ -34,7 +34,19 @@
                     <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button @click="confirmSave">Save Changes</button>
+                    <button @click="showSaveModal = true">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation modal for saving changes -->
+        <div class="modal" v-if="showSaveModal">
+            <div class="modal-content">
+                <i class="fas fa-info-circle"></i>
+                <p>Save changes?</p>
+                <div class="buttons">
+                    <button class="discard" @click="showSaveModal = false">Discard</button>
+                    <button class="save" @click="confirmSave">Save</button>
                 </div>
             </div>
         </div>
@@ -100,8 +112,8 @@ export default {
             this.isModalVisible = false;
         },
         async confirmSave() {
-            this.showSaveModal = true;
             await this.updateNote();
+            this.showSaveModal = false;
         },
         async updateNote() {
             try {
@@ -303,5 +315,29 @@ body {
         width: calc(100% - 20px);
         margin: 10px 0;
     }
+}
+
+/* Style for the save confirmation modal */
+.modal .buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.modal .buttons button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal .buttons .discard {
+    background-color: #f44336;
+    color: white;
+}
+
+.modal .buttons .save {
+    background-color: #4CAF50;
+    color: white;
 }
 </style>
