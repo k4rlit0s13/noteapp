@@ -219,12 +219,14 @@ body {
 }
 
 .header {
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
     padding: 20px;
     box-sizing: border-box;
+    width: 100%;
+    text-align: center;
 }
 
 .header h1 {
@@ -243,24 +245,29 @@ body {
 }
 
 .container {
-    width: 100%;
+    /* background-color: red; */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas en pantallas grandes */
+    gap: 15px; /* Espaciado entre los cubos */
+    width: 100vw;
     padding: 20px;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente los elementos en el grid */
 }
 
-.notes-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-}
-
+/* Ajuste para las notas */
 .note {
-    padding: 15px;
+    height: 150px; /* Altura fija para las notas */
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
     border-radius: 10px;
     color: black;
     text-align: center;
-    cursor: pointer;
-    margin: 5px;
+    margin: 5px; /* Margen para separación */
 }
 
 .modal {
@@ -288,50 +295,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Centrar contenido */
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.header i {
-    background-color: #3a3a3a;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 20px;
-}
-
-.content {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* Centrar título y contenido */
-}
-
-.title-input {
+.title-input, .content textarea {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
     border: none;
     background-color: #4a4a4a;
     color: white;
-    margin: 10px;
-}
-
-.content textarea {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    background-color: #4a4a4a;
-    color: white;
-    margin: 10px;
+    margin: 10px 0;
 }
 
 .modal-actions {
@@ -345,14 +318,12 @@ body {
     border: none;
     border-radius: 5px;
     background-color: #2db64f;
-    /* Cambiar color de fondo */
     color: white;
     cursor: pointer;
 }
 
 .modal-actions button:hover {
     background-color: #248d3e;
-    /* Color al pasar el ratón */
 }
 
 .add-note {
@@ -381,14 +352,14 @@ body {
         padding: 8px;
     }
 
-    .notes-list {
-        display: block;
-        padding: 0;
+    .container {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+        padding: 0; /* Ajustar el padding si es necesario */
     }
 
     .note {
-        margin: 10px 0;
-        text-align: left;
+        height: 150px; /* Ajusta la altura si es necesario */
+        margin: 10px 0; /* Margen vertical en móviles */
     }
 
     .modal-content {
@@ -424,21 +395,17 @@ body {
 
 .buttons .discard {
     background-color: #dc3545;
-    /* Color de fondo para el botón de descartar */
 }
 
 .buttons .save {
     background-color: #38b64d;
-    /* Color de fondo para el botón de guardar */
 }
 
 .buttons .discard:hover {
     background-color: #c82333;
-    /* Color al pasar el ratón */
 }
 
 .buttons .save:hover {
     background-color: #309941;
-    /* Color al pasar el ratón */
 }
 </style>
