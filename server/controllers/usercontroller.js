@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-}, { 
+}, {
     collection: 'USER',
     versionKey: false
 });
@@ -47,11 +47,11 @@ class UserController {
 
             // Crear el nuevo usuario
             const newUser = await User.create({ username, email, password: hashedPassword }); // Guardar la contraseña encriptada
-            
+
             const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
                 expiresIn: '1h',
             });
-            
+
             res.status(201).json({ message: 'User created', token });
         } catch (error) {
             console.error('Error creating user:', error); // Imprime el error en la consola
@@ -96,28 +96,27 @@ class UserController {
     static async authenticateUser(req, res) {
         try {
             const { email, password } = req.body;
-    
+
             // Verificar que los campos no estén vacíos
             if (!email || !password) {
                 return res.status(400).json({ error: 'Email and password are required' });
             }
-    
+
             // Buscar el usuario por email
             const user = await User.findOne({ email });
             if (!user) return res.status(404).json({ error: 'User not found' });
-    
+
             // Comparar la contraseña ingresada con la contraseña encriptada
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) return res.status(401).json({ error: 'Invalid password' });
-    
+
             // Generar un token JWT para el usuario encontrado
             const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
                 expiresIn: '1h',
             });
-    
-            // Establecer la cookie solo con el token JWT
-            res.cookie('auth_token', token, { httpOnly: true, secure: true, sameSite: 'Strict' });
-    
+            
+            res.cookie('auth_token', token); // Sin httpOnly y secure para pruebas
+
             // Mensaje de acceso concedido
             res.status(200).json({ message: 'Access granted' });
         } catch (error) {
@@ -125,10 +124,10 @@ class UserController {
             res.status(500).json({ error: 'Error during authentication' });
         }
     }
-    
-    
 
-    
+
+
+
 
 
 }

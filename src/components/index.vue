@@ -1,4 +1,5 @@
 <template>
+
   <body>
     <div class="container">
       <div class="icon">
@@ -36,12 +37,14 @@ export default {
           password: this.password
         }, { withCredentials: true });
 
+
         this.successMessage = response.data.message;
 
         // Redirigir a la página de inicio después de 2 segundos
         setTimeout(() => {
-          window.location.href = '../views/home.html'; 
+          window.location.href = '../views/home.html'; // Cambiar a window.location.href
         }, 2000);
+
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
       }
