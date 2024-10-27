@@ -1,15 +1,10 @@
 <template>
     <div>
         <div class="header">
-            <h1>Notes</h1>
+            <h1 v-if="!isSearchVisible || windowWidth > 600">Notes</h1>
             <div class="search-container" v-if="isSearchVisible">
-                <input
-                    type="text"
-                    class="search-input"
-                    placeholder="Search by the keyword..."
-                    v-model="searchTerm"
-                    @input="filterNotes"
-                />
+                <input type="text" class="search-input" placeholder="Search by keyword..." v-model="searchTerm"
+                    @input="filterNotes" />
                 <i class="fas fa-times search-icon" @click="toggleSearchVisibility"></i>
             </div>
             <i class="fas fa-search" @click="toggleSearchVisibility" v-if="!isSearchVisible"></i>
@@ -17,8 +12,8 @@
 
         <div class="container">
             <div class="notes-list" v-if="filteredNotes.length">
-                <div class="note" v-for="note in filteredNotes" :key="note._id" :style="{ backgroundColor: getRandomColor() }"
-                    @click="openModal(note)">
+                <div class="note" v-for="note in filteredNotes" :key="note._id"
+                    :style="{ backgroundColor: getRandomColor() }" @click="openModal(note)">
                     <h2>{{ note.title }}</h2>
                     <p>{{ truncateContent(note.content) }}</p>
                 </div>
@@ -26,9 +21,11 @@
 
             <div class="no-results" v-if="!hasResults && searchTerm">
                 <div class="image-container">
-                    <img alt="No results found" height="200" src="https://storage.googleapis.com/a1aa/image/7qq02nR00sZRPBUC1KJy5qHvwdVolDO6nkgejGGBgwd4yh1JA.jpg" width="300"/>
+                    <img alt="No results found" height="200"
+                        src="../storage/img/notfound.svg"
+                        width="300" />
                     <div class="message">
-                        File not found. Try searching again.
+                        No results found. Try searching again.
                     </div>
                 </div>
             </div>
@@ -39,9 +36,6 @@
                 <p>Create your first note!</p>
             </div>
         </div>
-
-        <!-- Modals remain unchanged... -->
-        <!-- (Add your existing modals here) -->
 
         <div class="add-note" @click="openCreateModal">
             <i class="fas fa-plus"></i>
@@ -57,15 +51,17 @@ export default {
             notes: [],
             filteredNotes: [],
             searchTerm: '',
-            isSearchVisible: false, // New data property to control search visibility
+            isSearchVisible: false,
             isModalVisible: false,
             selectedNote: { title: '', content: '', _id: '' },
             showSaveModal: false,
             isCreateModalVisible: false,
             newNote: { title: '', content: '' },
+            windowWidth: window.innerWidth, // Store window width in data
         };
     },
     mounted() {
+        window.addEventListener('resize', this.handleResize); // Add event listener
         const token = this.getCookie('auth_token');
         if (!token) {
             window.location.href = '../views/index.html';
@@ -73,10 +69,16 @@ export default {
             this.fetchUserNotes();
         }
     },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize); // Remove event listener
+    },
     methods: {
+        handleResize() {
+            this.windowWidth = window.innerWidth; // Update windowWidth on resize
+        },
         getCookie(name) {
             const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`); 
+            const parts = value.split(`; ${name}=`);
             return parts.length === 2 ? parts.pop().split(';').shift() : null;
         },
         async fetchUserNotes() {
@@ -87,7 +89,7 @@ export default {
                 });
                 if (response.ok) {
                     this.notes = await response.json();
-                    this.filteredNotes = this.notes; // Initialize filteredNotes with all notes
+                    this.filteredNotes = this.notes;
                 } else {
                     console.error('Error fetching notes:', response.statusText);
                 }
@@ -129,7 +131,9 @@ export default {
                 });
                 if (response.ok) {
                     this.notes = this.notes.map(note =>
-                        note._id === this.selectedNote._id ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title } : note
+                        note._id === this.selectedNote._id
+                            ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title }
+                            : note
                     );
                     this.closeModal();
                 } else {
@@ -141,7 +145,7 @@ export default {
         },
         openCreateModal() {
             this.isCreateModalVisible = true;
-            this.newNote = { title: '', content: '' }; // Reset fields
+            this.newNote = { title: '', content: '' };
         },
         closeCreateModal() {
             this.isCreateModalVisible = false;
@@ -169,7 +173,7 @@ export default {
                     const newNote = await response.json();
                     this.notes.push(newNote);
                     this.closeCreateModal();
-                    this.fetchUserNotes(); // Refresh the notes list
+                    this.fetchUserNotes();
                 } else {
                     console.error('Error creating note:', response.statusText);
                 }
@@ -179,31 +183,31 @@ export default {
         },
         filterNotes() {
             if (!this.searchTerm) {
-                this.filteredNotes = this.notes; // Show all notes if search term is empty
-                this.hasResults = true; // Reset hasResults when no search term
+                this.filteredNotes = this.notes;
+                this.hasResults = true;
                 return;
             }
 
-            const term = this.searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Normalize input
-            this.filteredNotes = this.notes.filter(note => 
-                note.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term)
+            const term = this.searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            this.filteredNotes = this.notes.filter(note =>
+                note.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(term)
             );
 
-            this.hasResults = this.filteredNotes.length > 0; // Check if there are results
+            this.hasResults = this.filteredNotes.length > 0;
         },
         toggleSearchVisibility() {
             this.isSearchVisible = !this.isSearchVisible;
             if (!this.isSearchVisible) {
-                this.searchTerm = ''; // Clear the search term when hiding the search input
-                this.filteredNotes = this.notes; // Reset to show all notes
+                this.searchTerm = '';
+                this.filteredNotes = this.notes;
             }
-        }
+        },
     },
     computed: {
         hasResults() {
-            return this.filteredNotes.length > 0; // Computed property to check results
-        }
-    }
+            return this.filteredNotes.length > 0;
+        },
+    },
 };
 </script>
 
