@@ -43,7 +43,7 @@ export default {
         // Redirigir a la página de inicio después de 2 segundos
         setTimeout(() => {
           window.location.href = '../views/home.html'; // Cambiar a window.location.href
-        }, 2000);
+        }, 500);
 
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
