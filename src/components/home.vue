@@ -10,8 +10,7 @@
 
         <div class="container">
             <div class="content" v-if="!notes.length">
-                <img alt="Illustration of a person standing next to a large notepad and pencil"
-                    src="../storage/img/note.svg" />
+                <img alt="Illustration of a person standing next to a large notepad and pencil" src="../storage/img/note.svg" />
                 <p>Create your first note!</p>
             </div>
 
@@ -34,7 +33,7 @@
                     <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button @click="showSaveModal = true">Save Changes</button>
+                    <button class="save-button" @click="showSaveModal = true">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -42,8 +41,10 @@
         <!-- Confirmation modal for saving changes -->
         <div class="modal" v-if="showSaveModal">
             <div class="modal-content">
-                <i class="fas fa-info-circle"></i>
-                <p>Save changes?</p>
+                <div class="icon-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Save changes?</p>
+                </div>
                 <div class="buttons">
                     <button class="discard" @click="showSaveModal = false">Discard</button>
                     <button class="save" @click="confirmSave">Save</button>
@@ -220,9 +221,12 @@ body {
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 90%;
-    max-width: 600px;
+    width: 80%;
+    max-width: 400px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar contenido */
 }
 
 .header {
@@ -243,6 +247,7 @@ body {
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
+    align-items: center; /* Centrar título y contenido */
 }
 
 .title-input {
@@ -252,7 +257,7 @@ body {
     border: none;
     background-color: #4a4a4a;
     color: white;
-    margin-bottom: 10px;
+    margin: 10px;
 }
 
 .content textarea {
@@ -263,6 +268,7 @@ body {
     border: none;
     background-color: #4a4a4a;
     color: white;
+    margin: 10px;
 }
 
 .modal-actions {
@@ -275,9 +281,13 @@ body {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #3a3a3a;
+    background-color: #2db64f; /* Cambiar color de fondo */
     color: white;
     cursor: pointer;
+}
+
+.modal-actions button:hover {
+    background-color: #248d3e; /* Color al pasar el ratón */
 }
 
 .add-note {
@@ -308,36 +318,58 @@ body {
 
     .notes-list {
         display: block;
-        padding: 0 10px;
+        padding: 0;
     }
 
     .note {
-        width: calc(100% - 20px);
         margin: 10px 0;
+        text-align: left;
+    }
+
+    .modal-content {
+        width: 90%;
     }
 }
 
-/* Style for the save confirmation modal */
-.modal .buttons {
+/* Modal de confirmación */
+.icon-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.icon-message i {
+    margin-right: 10px;
+}
+
+.buttons {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
+    width: 100%;
 }
 
-.modal .buttons button {
-    padding: 10px 15px;
-    border: none;
+.buttons button {
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+    color: white;
+    border: none;
 }
 
-.modal .buttons .discard {
-    background-color: #f44336;
-    color: white;
+.buttons .discard {
+    background-color: #dc3545; /* Color de fondo para el botón de descartar */
 }
 
-.modal .buttons .save {
-    background-color: #4CAF50;
-    color: white;
+.buttons .save {
+    background-color: #38b64d; /* Color de fondo para el botón de guardar */
+}
+
+.buttons .discard:hover {
+    background-color: #c82333; /* Color al pasar el ratón */
+}
+
+.buttons .save:hover {
+    background-color: #309941; /* Color al pasar el ratón */
 }
 </style>
