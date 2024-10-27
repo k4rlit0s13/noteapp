@@ -15,9 +15,20 @@
         </div>
         
         <div class="notes-list" v-if="notes.length">
-            <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }">
+            <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }" @click="openModal(note)">
                 <h2>{{ note.title }}</h2>
                 <p>{{ truncateContent(note.content) }}</p>
+            </div>
+        </div>
+
+        <!-- Modal for editing note -->
+        <div class="modal" v-if="isModalVisible">
+            <div class="modal-content">
+                <span class="close" @click="closeModal">&times;</span>
+                <h2>Edit Note</h2>
+                <input v-model="selectedNote.title" placeholder="Title" />
+                <textarea v-model="selectedNote.content" placeholder="Content"></textarea>
+                <button @click="updateNote">Save Changes</button>
             </div>
         </div>
         
@@ -33,6 +44,8 @@ export default {
     data() {
         return {
             notes: [], // Arreglo para almacenar las notas
+            isModalVisible: false, // Controla la visibilidad del modal
+            selectedNote: { title: '', content: '', _id: '' }, // Para almacenar la nota seleccionada
         };
     },
     mounted() {
@@ -78,6 +91,39 @@ export default {
             }
             return color; // Generar color aleatorio
         },
+        openModal(note) {
+            this.selectedNote = { ...note }; // Clonar la nota seleccionada
+            this.isModalVisible = true; // Mostrar el modal
+        },
+        closeModal() {
+            this.isModalVisible = false; // Cerrar el modal
+        },
+        async updateNote() {
+            try {
+                const response = await fetch('https://localhost:5000/api/v1/notes/updatenote', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        noteId: this.selectedNote._id,
+                        userId: this.getCookie('auth_token'), // Asegúrate de que el userId se obtenga correctamente
+                        title: this.selectedNote.title,
+                        content: this.selectedNote.content,
+                    }),
+                });
+                if (response.ok) {
+                    this.notes = this.notes.map(note =>
+                        note._id === this.selectedNote._id ? { ...note, title: this.selectedNote.title, content: this.selectedNote.content } : note
+                    );
+                    this.closeModal(); // Cerrar el modal después de actualizar
+                } else {
+                    console.error('Error updating note:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error updating note:', error);
+            }
+        },
         addNote() {
             // Aquí puedes manejar la lógica para agregar una nueva nota
             console.log('Add Note clicked');
@@ -87,7 +133,6 @@ export default {
 </script>
 
 <style>
-/* Aquí puedes mantener tus estilos existentes o agregar nuevos según lo necesites */
 body {
     margin: 0;
     padding: 0;
@@ -150,6 +195,7 @@ body {
     border-radius: 8px;
     width: 80%;
     transition: background-color 0.3s;
+    cursor: pointer; /* Cambiar el cursor para indicar que es clickeable */
 }
 
 .add-note {
@@ -168,6 +214,36 @@ body {
 
 .add-note i {
     font-size: 2em;
+}
+
+/* Modal styles */
+.modal {
+    display: flex;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: #3a3a3a;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+}
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 /* Media queries */
