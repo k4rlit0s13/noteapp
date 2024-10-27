@@ -40,6 +40,32 @@
         <div class="add-note" @click="openCreateModal">
             <i class="fas fa-plus"></i>
         </div>
+
+        <!-- Modal to view/edit a note -->
+        <div class="modal" v-if="isModalVisible">
+            <div class="modal-content">
+                <h2>Edit Note</h2>
+                <input type="text" v-model="selectedNote.title" class="title-input" placeholder="Note Title">
+                <textarea v-model="selectedNote.content" placeholder="Content" rows="4"></textarea>
+                <div class="modal-actions">
+                    <button @click="confirmSave">Save</button>
+                    <button @click="closeModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal to create a new note -->
+        <div class="modal" v-if="isCreateModalVisible">
+            <div class="modal-content">
+                <h2>Create Note</h2>
+                <input type="text" v-model="newNote.title" class="title-input" placeholder="Note Title">
+                <textarea v-model="newNote.content" placeholder="Content" rows="4"></textarea>
+                <div class="modal-actions">
+                    <button @click="createNote">Create</button>
+                    <button @click="closeCreateModal">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -54,14 +80,13 @@ export default {
             isSearchVisible: false,
             isModalVisible: false,
             selectedNote: { title: '', content: '', _id: '' },
-            showSaveModal: false,
             isCreateModalVisible: false,
             newNote: { title: '', content: '' },
-            windowWidth: window.innerWidth, // Store window width in data
+            windowWidth: window.innerWidth,
         };
     },
     mounted() {
-        window.addEventListener('resize', this.handleResize); // Add event listener
+        window.addEventListener('resize', this.handleResize);
         const token = this.getCookie('auth_token');
         if (!token) {
             window.location.href = '../views/index.html';
@@ -70,11 +95,11 @@ export default {
         }
     },
     beforeUnmount() {
-        window.removeEventListener('resize', this.handleResize); // Remove event listener
+        window.removeEventListener('resize', this.handleResize);
     },
     methods: {
         handleResize() {
-            this.windowWidth = window.innerWidth; // Update windowWidth on resize
+            this.windowWidth = window.innerWidth;
         },
         getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -113,7 +138,7 @@ export default {
         },
         async confirmSave() {
             await this.updateNote();
-            this.showSaveModal = false;
+            this.isModalVisible = false;
         },
         async updateNote() {
             try {
@@ -124,7 +149,6 @@ export default {
                     },
                     body: JSON.stringify({
                         noteId: this.selectedNote._id,
-                        userId: this.getCookie('auth_token'),
                         title: this.selectedNote.title,
                         content: this.selectedNote.content,
                     }),
@@ -135,7 +159,7 @@ export default {
                             ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title }
                             : note
                     );
-                    this.closeModal();
+                    this.fetchUserNotes();
                 } else {
                     console.error('Error updating note:', response.statusText);
                 }
@@ -145,7 +169,6 @@ export default {
         },
         openCreateModal() {
             this.isCreateModalVisible = true;
-            this.newNote = { title: '', content: '' };
         },
         closeCreateModal() {
             this.isCreateModalVisible = false;
@@ -163,11 +186,7 @@ export default {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'include',
-                    body: JSON.stringify({
-                        userId: this.getCookie('auth_token'),
-                        title: this.newNote.title,
-                        content: this.newNote.content,
-                    }),
+                    body: JSON.stringify(this.newNote),
                 });
                 if (response.ok) {
                     const newNote = await response.json();
@@ -184,7 +203,6 @@ export default {
         filterNotes() {
             if (!this.searchTerm) {
                 this.filteredNotes = this.notes;
-                this.hasResults = true;
                 return;
             }
 
@@ -192,24 +210,22 @@ export default {
             this.filteredNotes = this.notes.filter(note =>
                 note.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(term)
             );
-
-            this.hasResults = this.filteredNotes.length > 0;
         },
         toggleSearchVisibility() {
             this.isSearchVisible = !this.isSearchVisible;
             if (!this.isSearchVisible) {
-                this.searchTerm = '';
                 this.filteredNotes = this.notes;
             }
-        },
+        }
     },
     computed: {
         hasResults() {
             return this.filteredNotes.length > 0;
-        },
-    },
+        }
+    }
 };
 </script>
+
 
 
 <style>
