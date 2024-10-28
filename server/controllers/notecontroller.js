@@ -224,6 +224,32 @@ class NoteController {
     }
 
 
+
+
+    async getNoteById(req, res) {
+      try {
+        const { id } = req.params; // Obtener el id desde los parámetros de la ruta
+  
+        // Validar que el id esté presente
+        if (!id) {
+          return res.status(400).json({ error: 'Note ID is required' });
+        }
+  
+        // Buscar la nota por id
+        const note = await Note.findById(id);
+        if (!note) {
+          return res.status(404).json({ error: 'Note not found' });
+        }
+  
+        return res.status(200).json(note); // Devolver la nota encontrada
+      } catch (error) {
+        console.error('Error fetching note by ID:', error);
+        return res.status(500).json({ error: 'Error fetching note' });
+      }
+    }
+
+    
+
 }
 
 export default new NoteController();

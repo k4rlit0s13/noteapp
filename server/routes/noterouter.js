@@ -12,4 +12,7 @@ router.put('/updatenote', (req, res) => noteController.update(req, res)); // Cam
 // Ruta para obtener notas del usuario
 router.get('/getUserNotes', (req, res) => noteController.getUserNotes(req, res)); // Nueva ruta para obtener notas
 
+// Ruta para obtener una nota por ID
+router.get('/note/:id', (req, res) => noteController.getNoteById(req, res)); // Nueva ruta para obtener una nota por ID
+
 export default router;
