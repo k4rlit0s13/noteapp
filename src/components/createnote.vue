@@ -3,14 +3,24 @@
         <div class="modal-content">
             <div class="header">
                 <i class="fas fa-arrow-left" @click="goBack"></i>
-                <h2>Create a New Note</h2>
+                <div class="header-icons">
+                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-save" @click="createNote" style="margin-left: 20px;"></i>
+                </div>
             </div>
-            <div class="content">
-                <input type="text" v-model="newNote.title" class="title-input" placeholder="Note Title" />
-                <textarea v-model="newNote.content" placeholder="Content"></textarea>
-            </div>
-            <div class="modal-actions">
-                <button class="save-button" @click="createNote">Create Note</button>
+
+            <div class="container">
+                <input 
+                    type="text" 
+                    v-model="newNote.title" 
+                    class="title-input" 
+                    placeholder="Title" 
+                />
+                <textarea 
+                    v-model="newNote.content" 
+                    class="content-input" 
+                    placeholder="Type something..." 
+                ></textarea>
             </div>
         </div>
     </div>
@@ -55,3 +65,70 @@ export default {
     },
 };
 </script>
+
+<style>
+body, .modal {
+    background-color: #2b2b2b;
+    color: #b0b0b0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 600px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.header i, .header-icons i {
+    font-size: 24px;
+    color: #b0b0b0;
+    cursor: pointer;
+}
+
+.container {
+    text-align: left;
+    width: 100%;
+}
+
+.title-input {
+    font-size: 32px;
+    width: 100%;
+    padding: 10px 0;
+    margin: 20px 0;
+    border: none;
+    border-bottom: 1px solid #555;
+    background-color: transparent;
+    color: #ffffff;
+    outline: none;
+}
+
+.content-input {
+    width: 100%;
+    font-size: 18px;
+    padding: 10px 0;
+    margin-top: 10px;
+    border: none;
+    border-bottom: 1px solid #555;
+    background-color: transparent;
+    color: #b0b0b0;
+    outline: none;
+    resize: none;
+    height: 60vh;
+}
+</style>

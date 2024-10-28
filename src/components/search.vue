@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <div id="search-container" class="search-container">
             <input 
                 type="text" 
@@ -12,8 +12,8 @@
             <i class="fas fa-times search-icon" id="search-icon" @click="clearSearch"></i>
         </div>
 
-        <!-- Mostrar imagen de "no se encontró" si no hay resultados -->
-        <div v-if="noResults" id="not-found">
+        <!-- Imagen de "no se encontró" si no hay resultados -->
+        <div v-if="noResults" id="not-found" class="not-found-container">
             <div class="image-container">
                 <img alt="Not Found" src="../storage/img/notfound.svg" />
                 <div class="message">File not found. Try searching again.</div>
@@ -21,13 +21,14 @@
         </div>
 
         <div class="notes-list" v-if="filteredNotes.length">
-            <div class="note" 
-                v-for="note in filteredNotes" 
-                :key="note._id"
-                @click="openNoteDetail(note._id)"
+            <div 
+                class="note" 
+                v-for="(note, index) in filteredNotes" 
+                :key="note._id" 
+                @click="openNoteDetail(note._id)" 
+                :style="{ backgroundColor: noteColors[index % noteColors.length] }"
             >
                 <h2>{{ note.title }}</h2>
-                <p>{{ truncateContent(note.content) }}</p>
             </div>
         </div>
     </div>
@@ -42,6 +43,7 @@ export default {
             filteredNotes: [],
             searchQuery: '',
             noResults: false,
+            noteColors: ['#ffb6c1', '#ffcccb', '#90ee90', '#ffffe0', '#add8e6'] // Colores aleatorios
         };
     },
     mounted() {
@@ -79,10 +81,117 @@ export default {
         },
         openNoteDetail(noteId) {
             window.location.href = `../views/infonote.html?noteId=${noteId}`;
-        },
-        truncateContent(content) {
-            return content.length > 30 ? content.slice(0, 30) + '...' : content;
         }
     },
 };
 </script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden; /* Ocultar desbordamiento vertical */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    padding: 20px;
+}
+
+.search-container {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 20px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background-color: #333;
+    color: #ccc;
+}
+
+.search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    cursor: pointer;
+}
+
+.not-found-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 40vh; /* Ajuste de altura para centrar más arriba */
+}
+
+.image-container img {
+    width: 80%;
+    max-width: 250px;
+}
+
+.message {
+    font-size: 16px;
+    margin-top: 15px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.notes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+}
+
+.note {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #000000; /* Cambiado a negro */
+    font-size: 16px;
+}
+
+.note h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+@media (max-width: 767px) {
+    .notes-list {
+        flex-direction: column;
+    }
+}
+</style>
