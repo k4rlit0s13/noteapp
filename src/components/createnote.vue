@@ -4,7 +4,6 @@
             <div class="header">
                 <i class="fas fa-arrow-left" @click="goBack"></i>
                 <div class="header-icons">
-                    <i class="fas fa-eye"></i>
                     <i class="fas fa-save" @click="createNote" style="margin-left: 20px;"></i>
                 </div>
             </div>
@@ -68,7 +67,7 @@ export default {
 
 <style>
 body, .modal {
-    background-color: #2b2b2b;
+    background-color: #1c1c1c;
     color: #b0b0b0;
     font-family: Arial, sans-serif;
     margin: 0;

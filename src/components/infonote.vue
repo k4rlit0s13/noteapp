@@ -44,13 +44,12 @@
     </div>
 </template>
 
-
 <script>
 export default {
     name: 'infonote',
     data() {
         return {
-            note: { title: '', content: '', _id: '' },
+            note: { title: '', content: '', _id: '', userId: '' },
             showSaveModal: false,
             showSuccessMessage: false,
             showPreview: false,
@@ -73,7 +72,11 @@ export default {
                     credentials: 'include',
                 });
                 if (response.ok) {
-                    this.note = await response.json();
+                    const data = await response.json();
+                    this.note = {
+                        ...data,
+                        userId: data.userId || this.getUserIdFromToken(), // Asegura que userId esté presente
+                    };
                 } else {
                     console.error('Error fetching note details:', response.statusText);
                 }
@@ -99,8 +102,10 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include', // Para enviar las cookies, incluido el token
                     body: JSON.stringify({
                         noteId: this.note._id,
+                        userId: this.note.userId, // Agrega el userId aquí
                         title: this.note.title,
                         content: this.note.content,
                     }),
@@ -122,9 +127,25 @@ export default {
         closeSuccessMessage() {
             this.showSuccessMessage = false;
         },
+        getUserIdFromToken() {
+            const token = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('auth_token='))
+                ?.split('=')[1];
+            if (!token) return null;
+
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return payload.userId;
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                return null;
+            }
+        },
     },
 };
 </script>
+
 
 <style>
 body {
