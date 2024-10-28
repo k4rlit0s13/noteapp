@@ -562,7 +562,7 @@ view search note not found:
    </span>
   </div>
   <div class="image-container">
-   <img alt="Two people searching for a file with a magnifying glass and a question mark" height="200" src="https://storage.googleapis.com/a1aa/image/7qq02nR00sZRPBUC1KJy5qHvwdVolDO6nkgejGGBgwd4yh1JA.jpg" width="300"/>
+   <img alt="Two people searching for a file with a magnifying glass and a question mark" height="200" src="../storage/notfound.svg" width="300"/>
    <div class="message">
     File not found. Try searching again.
    </div>

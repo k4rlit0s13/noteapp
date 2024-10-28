@@ -3,24 +3,50 @@
         <div class="header">
             <h1>Notes</h1>
             <div class="icons">
-                <i class="fas fa-search"></i>
+                <i class="fas fa-search" @click="toggleSearchBar"></i>
                 <i class="fas fa-info-circle"></i>
             </div>
         </div>
 
+        <!-- Search Bar -->
+        <div id="search-container" class="search-container" v-if="isSearchBarVisible">
+            <input 
+                type="text" 
+                id="search-input" 
+                class="search-input" 
+                v-model="searchQuery" 
+                placeholder="Search by the keyword..." 
+                @input="filterNotes"
+            />
+            <i class="fas fa-times search-icon" id="search-icon" @click="clearSearch"></i>
+        </div>
+
         <div class="container">
-            <div class="content" v-if="!notes.length">
-                <img alt="Illustration of a person standing next to a large notepad and pencil"
-                    src="../storage/img/note.svg" />
-                <p>Create your first note!</p>
+            <!-- Show not found image if there are no results after filtering -->
+            <div v-if="noResults" id="not-found">
+                <div class="image-container">
+                    <img alt="Not Found" src="../storage/img/notfound.svg" />
+                    <div class="message">File not found. Try searching again.</div>
+                </div>
             </div>
 
-            <div class="notes-list" v-if="notes.length">
-                <div class="note" v-for="note in notes" :key="note._id" :style="{ backgroundColor: getRandomColor() }"
-                    @click="openModal(note)">
+            <div class="notes-list" v-if="filteredNotes.length">
+                <div class="note" 
+                    v-for="(note, index) in filteredNotes" 
+                    :key="note._id"
+                    :style="{ backgroundColor: getColor(index) }"
+                    @click="openModal(note)"
+                >
                     <h2>{{ note.title }}</h2>
                     <p>{{ truncateContent(note.content) }}</p>
                 </div>
+            </div>
+
+            <!-- Show this message if there are no notes at all -->
+            <div v-if="!notes.length && !isSearchBarVisible">
+                <img alt="Illustration of a person standing next to a large notepad and pencil"
+                    src="../storage/img/note.svg" />
+                <p>Create your first note!</p>
             </div>
         </div>
 
@@ -83,11 +109,15 @@ export default {
     data() {
         return {
             notes: [],
+            filteredNotes: [],
             isModalVisible: false,
             selectedNote: { title: '', content: '', _id: '' },
             showSaveModal: false,
             isCreateModalVisible: false,
             newNote: { title: '', content: '' },
+            isSearchBarVisible: false,
+            searchQuery: '',
+            noResults: false,
         };
     },
     mounted() {
@@ -112,6 +142,7 @@ export default {
                 });
                 if (response.ok) {
                     this.notes = await response.json();
+                    this.filteredNotes = this.notes; // Initialize with all notes
                 } else {
                     console.error('Error fetching notes:', response.statusText);
                 }
@@ -119,12 +150,30 @@ export default {
                 console.error('Error fetching notes:', error);
             }
         },
+        filterNotes() {
+            const query = this.searchQuery.toLowerCase().trim();
+            this.filteredNotes = this.notes.filter(note => 
+                note.title.toLowerCase().includes(query)
+            );
+            this.noResults = this.filteredNotes.length === 0 && this.searchQuery !== '';
+        },
+        toggleSearchBar() {
+            this.isSearchBarVisible = !this.isSearchBarVisible;
+            if (!this.isSearchBarVisible) {
+                this.clearSearch();
+            }
+        },
+        clearSearch() {
+            this.searchQuery = '';
+            this.filterNotes();
+            this.isSearchBarVisible = false;
+        },
         truncateContent(content) {
             return content.length > 30 ? content.slice(0, 30) + '...' : content;
         },
-        getRandomColor() {
+        getColor(index) {
             const colors = ['#ffb6c1', '#ffcccb', '#90ee90', '#ffffe0', '#add8e6'];
-            return colors[Math.floor(Math.random() * colors.length)];
+            return colors[index % colors.length];
         },
         openModal(note) {
             this.selectedNote = { ...note };
@@ -155,6 +204,7 @@ export default {
                     this.notes = this.notes.map(note =>
                         note._id === this.selectedNote._id ? { ...note, content: this.selectedNote.content, title: this.selectedNote.title } : note
                     );
+                    this.filterNotes(); // Refresh the filtered notes
                     this.closeModal();
                 } else {
                     console.error('Error updating note:', response.statusText);
@@ -182,9 +232,9 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include', // Asegúrate de incluir esta línea
+                    credentials: 'include',
                     body: JSON.stringify({
-                        userId: this.getCookie('auth_token'), // Asegúrate de que esto sea correcto
+                        userId: this.getCookie('auth_token'),
                         title: this.newNote.title,
                         content: this.newNote.content,
                     }),
@@ -192,41 +242,36 @@ export default {
                 if (response.ok) {
                     const newNote = await response.json();
                     this.notes.push(newNote);
+                    this.filterNotes(); // Update filtered notes
                     this.closeCreateModal();
-                    this.fetchUserNotes(); // Refresh the notes list
                 } else {
                     console.error('Error creating note:', response.statusText);
                 }
             } catch (error) {
                 console.error('Error creating note:', error);
             }
-        }
-        ,
-        addNote() {
-            console.log('Add Note clicked');
         },
     },
 };
 </script>
 
-
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
     background-color: #1c1c1c;
-    color: white;
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #ffffff;
 }
 
 .header {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
     padding: 20px;
     box-sizing: border-box;
-    width: 100%;
-    text-align: center;
 }
 
 .header h1 {
@@ -244,86 +289,78 @@ body {
     cursor: pointer;
 }
 
-.container {
-    /* background-color: red; */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Dos columnas en pantallas grandes */
-    gap: 15px; /* Espaciado entre los cubos */
-    width: 100vw;
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center; /* Centra horizontalmente los elementos en el grid */
-}
-
-/* Ajuste para las notas */
-.note {
-    height: 150px; /* Altura fija para las notas */
-    width: 90vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centrar verticalmente */
-    justify-content: center; /* Centrar horizontalmente */
-    border-radius: 10px;
-    color: black;
-    text-align: center;
-    margin: 5px; /* Margen para separación */
-}
-
-.modal {
-    display: flex;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
+.search-container {
+    position: relative;
     width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.modal-content {
-    background-color: #3a3a3a;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.title-input, .content textarea {
+.search-input {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 10px 40px 10px 20px;
+    border-radius: 20px;
     border: none;
-    background-color: #4a4a4a;
-    color: white;
-    margin: 10px 0;
+    outline: none;
+    font-size: 16px;
+    background-color: #333;
+    color: #ccc;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-.modal-actions button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #2db64f;
-    color: white;
+.search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
     cursor: pointer;
 }
 
-.modal-actions button:hover {
-    background-color: #248d3e;
+.container {
+    text-align: left;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.notes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.note {
+    background-color: #ffb6c1;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.note:nth-child(2) {
+    background-color: #ffcccb;
+}
+
+.note:nth-child(3) {
+    background-color: #90ee90;
+}
+
+.note:nth-child(4) {
+    background-color: #ffffe0;
+}
+
+.note:nth-child(5) {
+    background-color: #add8e6;
+}
+
+.note h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.note p {
+    font-size: 16px;
+    margin-bottom: 20px;
 }
 
 .add-note {
@@ -342,70 +379,67 @@ body {
     cursor: pointer;
 }
 
-/* Media queries */
-@media (max-width: 600px) {
-    .header h1 {
-        font-size: 1.5em;
-    }
-
-    .header .icons i {
-        padding: 8px;
-    }
-
-    .container {
-        grid-template-columns: 1fr; /* Una columna en móviles */
-        padding: 0; /* Ajustar el padding si es necesario */
-    }
-
-    .note {
-        height: 150px; /* Ajusta la altura si es necesario */
-        margin: 10px 0; /* Margen vertical en móviles */
-    }
-
-    .modal-content {
-        width: 90%;
-    }
-}
-
-/* Modal de confirmación */
-.icon-message {
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
 }
 
-.icon-message i {
-    margin-right: 10px;
+.modal-content {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 400px;
 }
 
-.buttons {
+.modal-actions {
     display: flex;
-    justify-content: space-around;
-    width: 100%;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
-.buttons button {
+.save-button {
     padding: 10px 20px;
+    font-size: 18px;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
+    background-color: green;
     color: white;
+}
+
+.discard {
+    padding: 10px 20px;
+    font-size: 18px;
     border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
 }
 
-.buttons .discard {
-    background-color: #dc3545;
+.image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
-.buttons .save {
-    background-color: #38b64d;
+.image-container img {
+    width: 300px;
 }
 
-.buttons .discard:hover {
-    background-color: #c82333;
-}
-
-.buttons .save:hover {
-    background-color: #309941;
+.message {
+    font-size: 16px;
+    margin-top: 20px;
+    text-align: center;
 }
 </style>
