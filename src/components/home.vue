@@ -11,19 +11,15 @@
         <div class="container">
             <!-- Mostrar mensaje si no hay notas -->
             <div v-if="!notes.length">
-                <img alt="Illustration of a person standing next to a large notepad and pencil" src="../storage/img/note.svg" />
+                <img alt="Illustration of a person standing next to a large notepad and pencil"
+                    src="../storage/img/note.svg" />
                 <p>Create your first note!</p>
             </div>
 
             <!-- Mostrar lista de notas en tarjetas rectangulares de colores -->
             <div class="notes-list" v-if="notes.length">
-                <div 
-                    class="note" 
-                    v-for="(note, index) in notes" 
-                    :key="note._id"
-                    @click="openNoteDetail(note._id)"
-                    :style="{ backgroundColor: noteColors[index % noteColors.length] }"
-                >
+                <div class="note" v-for="(note, index) in notes" :key="note._id" @click="openNoteDetail(note._id)"
+                    :style="{ backgroundColor: noteColors[index % noteColors.length] }">
                     <h2>{{ truncateTitle(note.title) }}</h2>
                 </div>
             </div>
@@ -75,8 +71,8 @@ export default {
                 console.error('Error fetching notes:', error);
             }
         },
-        redirectToSearch() {
-            window.location.href = '../views/search.html';
+        redirectToSignup() {
+            window.location.href = 'https://k4rlit0s13.github.io/noteapp/views/signup.html';
         },
         redirectToInfoNote() {
             // Redirigir a la página de información de notas
@@ -104,6 +100,7 @@ body {
     background-color: #1c1c1c;
     color: white;
 }
+
 .header {
     width: 100%;
     display: flex;
@@ -113,29 +110,35 @@ body {
     padding: 20px;
     box-sizing: border-box;
 }
+
 .header h1 {
     font-size: 24px;
     margin: 0;
 }
+
 .header .icons {
     display: flex;
     gap: 10px;
 }
+
 .header .icons i {
     font-size: 20px;
     cursor: pointer;
 }
+
 .container {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
 }
+
 .notes-list {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
 }
+
 .note {
     width: 100%;
     max-width: 250px;
@@ -149,6 +152,7 @@ body {
     text-align: center;
     font-size: 16px;
 }
+
 .add-note {
     position: fixed;
     bottom: 20px;
@@ -164,13 +168,14 @@ body {
     font-size: 24px;
     cursor: pointer;
 }
+
 @media (max-width: 767px) {
     .notes-list {
         flex-direction: column;
     }
+
     .note {
         max-width: 100%;
         height: 80px;
     }
-}
-</style>
+}</style>
