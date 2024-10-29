@@ -21,4 +21,7 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  build: {
+    outDir: path.resolve(__dirname, 'dist'), // Asegúrate de que esta línea esté presente
+  },
 });
