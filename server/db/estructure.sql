@@ -29,7 +29,6 @@ db.createCollection("USER", {
 });
 
 
-
 db.createCollection("NOTE", {
   validator: {
     $jsonSchema: {
@@ -59,11 +58,16 @@ db.createCollection("NOTE", {
         updatedAt: {
           bsonType: "date",
           description: "Note update date"
+        },
+        visualization: {
+          bsonType: "bool",
+          description: "Indicates if the note has been visualized"
         }
       }
     }
   }
 });
+
 
 
 db.createCollection("HISTORY", {
@@ -124,3 +128,11 @@ db.createCollection("HISTORY", {
 });
 
 
+
+
+db.NOTE.updateOne( 
+  { _id: ObjectId("671bceb5c65009f39cce9725") },
+  { $set: { visualization: false } }
+)
+
+listo tenemos la consulta funcionando

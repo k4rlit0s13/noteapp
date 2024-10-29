@@ -1,34 +1,53 @@
-URI: 
-mongodb://root:campus2023@localhost:27017/
-(recordar poner la de atlas para poder dejarlo desplegado)
-URIATLAS:
-mongodb+srv://kadavzu:carlos123@clustercarlos.qb1yv8u.mongodb.net/
+# API Documentation
 
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Environment Variables](#environment-variables)
+3. [Dependencies](#dependencies)
+4. [Running the Application](#running-the-application)
+5. [API Endpoints](#api-endpoints)
+   - [User  Authentication](#user-authentication)
+   - [Notes Management](#notes-management)
 
-.env:
+---
 
-// atlas
+## Introduction
+
+This API allows users to create and manage notes. It includes user authentication and uses JWT for secure access.
+
+## Environment Variables
+
+To configure your application, create a `.env` file in the root directory with the following variables:
+
+### Atlas Configuration
+```plaintext
 FRONTEND_PORT=3000
 BACKEND_PORT=5000
 MONGODB_URI=mongodb+srv://kadavzu:carlos123@clustercarlos.qb1yv8u.mongodb.net/notesappdb
 MONGODB_DB_NAME=notesappdb
 JWT_SECRET=tu_clave_secreta
+```
 
-//local
+### Local Configuration
+```plaintext
 FRONTEND_PORT=3000
 BACKEND_PORT=5000
 MONGODB_URI=mongodb://root:campus2023@localhost:27017/noteappdb
 MONGODB_DB_NAME=notesappdb
 JWT_SECRET=tu_clave_secreta
+```
 
+## Dependencies
 
+To install all required dependencies, run:
 
-dependencias: instalar todas
+```bash
+npm install
+```
 
-npm i
+Alternatively, you can install them one by one:
 
-dependencias: instalar una a una si es posible
-
+```bash
 npm install vue
 npm install cors
 npm install dotenv
@@ -43,59 +62,29 @@ npm install https fs
 npm install cross-env --save-dev
 npm install bcrypt
 npm install axios cookiejs
-npm i cookie-parser
+npm install cookie-parser
+```
 
-correr:
-npm run dev
+## Running the Application
 
+To start the application in development mode, use:
 
-## API Documentation: 
+```bash
+npm run dev:all
+```
 
+## API Endpoints
 
+### User Authentication
 
-find user
+#### 1. Create User
+- **Endpoint:** `POST /api/v1/users/createuser`
+- **Description:** Creates a new user in the database and returns a JWT token for authentication.
 
-https://localhost:5000/api/v1/users/authenticate
-
-
-esta no funciona en testeo de api debido a sus diferentes dependencias con el front y que verifica que la cookie creada contiene los datos y verifica en la db los datos del token y encritpados.
-
-
-
-
-find notes
-
-https://localhost:5000/api/v1/notes/getUserNotes 
-
-no funciona en normal, es neseario una cookie que se crea al logear en el navegador
-
-
-
-Create User
-
-### Endpoint
-
-https://localhost:5000/api/v1/users/createuser
-
-**Método:** `POST`  
-**Ruta:** `/api/v1/notes/createuser`  
-
-### Description
-Este endpoint permite crear un nuevo usuario en la base de datos. Al crear un usuario, se genera un token JWT que se devuelve en la respuesta. Este token puede ser utilizado para autenticación en futuras solicitudes.
-
-### Request Headers
+##### Request Headers
 - `Content-Type: application/json`
 
-### Request Body
-Debes enviar un JSON con los siguientes campos:
-
-| Field     | Type   | Required | Description                      |
-|-----------|--------|----------|----------------------------------|
-| username  | String | Yes      | El nombre de usuario del nuevo usuario. Debe ser único. |
-| email     | String | Yes      | La dirección de correo electrónico del nuevo usuario. Debe ser única. |
-| password  | String | Yes      | La contraseña del nuevo usuario. |
-
-#### Example Request Body
+##### Request Body
 ```json
 {
   "username": "caliche",
@@ -104,192 +93,121 @@ Debes enviar un JSON con los siguientes campos:
 }
 ```
 
-### Responses
-
-#### Success Response
-- **Code**: 201 Created
-- **Content**:
+##### Responses
+- **201 Created**
 ```json
 {
-  "message": "User created",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MWI4YzQ0NTUwNDMwMzZlNDQxYzk2ZSIsImlhdCI6MTcyOTg1ODYyOCwiZXhwIjoxNzI5ODYyMjI4fQ.WW0nJLPHBa9vFsYbjz0LvZlY_-oFSMd8H1Ca07oOxks"
+  "message": "User  created",
+  "token": "JWT_TOKEN"
+}
+```
+- **400 Bad Request**
+```json
+{
+  "error": "Username already exists"
+}
+```
+```json
+{
+  "error": "Email already exists"
+}
+```
+```json
+{
+  "error": "All fields are required and must be strings."
+}
+```
+- **500 Internal Server Error**
+```json
+{
+  "error": "Error creating user"
 }
 ```
 
-#### Error Responses
-- **Code**: 400 Bad Request
-  - **Content**:
-  ```json
-  {
-    "error": "Username already exists"
-  }
-  ```
-  - **Description**: Se produce si el nombre de usuario ya está en uso.
+### Notes Management
 
-- **Code**: 400 Bad Request
-  - **Content**:
-  ```json
-  {
-    "error": "Email already exists"
-  }
-  ```
-  - **Description**: Se produce si la dirección de correo electrónico ya está en uso.
+#### 2. Create Note
+- **Endpoint:** `POST /api/v1/notes/createnote`
+- **Description:** Creates a new note for a user.
 
-- **Code**: 400 Bad Request
-  - **Content**:
-  ```json
-  {
-    "error": "All fields are required and must be strings."
-  }
-  ```
-  - **Description**: Se produce si algún campo está vacío o no es una cadena.
-
-- **Code**: 500 Internal Server Error
-  - **Content**:
-  ```json
-  {
-    "error": "Error creating user"
-  }
-  ```
-  - **Description**: Se produce si hay un error en el servidor al intentar crear el usuario.
-
-### Notes
-- Asegúrate de que los campos `username` y `email` sean únicos al intentar crear un nuevo usuario.
-- El token JWT se utiliza para autenticar al usuario en futuras solicitudes a la API.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 1. Crear Nota (createNote)
-
-https://localhost:5000/api/v1/notes/createnote
-
-**Método:** `POST`  
-**Ruta:** `/api/v1/notes/createnote`  
-
-##### Descripción
-Crea una nueva nota y registra el historial de la acción.
-
-##### Parámetros del Cuerpo de la Solicitud
+##### Request Body
 ```json
 {
-  "userId": "ObjectId", // ID del usuario que crea la nota (requerido)
-  "title": "string",    // Título de la nota (requerido)
-  "content": "string"   // Contenido de la nota (requerido)
+  "userId": "ObjectId",
+  "title": "string",
+  "content": "string"
 }
 ```
 
-##### Respuesta Exitosa
-- **Código:** `201 Created`
-- **Cuerpo:**
+##### Responses
+- **201 Created**
 ```json
 {
   "message": "Note created successfully",
-  "token": "JWT_TOKEN" // Token JWT generado para la nueva nota
+  "token": "JWT_TOKEN"
 }
 ```
-
-##### Respuestas de Error
-- **Código:** `400 Bad Request`
-  - **Cuerpo:**
-  ```json
-  {
-    "error": "User ID, title, and content are required"
-  }
-  ```
-
-- **Código:** `404 Not Found`
-  - **Cuerpo:**
-  ```json
-  {
-    "error": "User not found"
-  }
-  ```
-
-- **Código:** `500 Internal Server Error`
-  - **Cuerpo:**
-  ```json
-  {
-    "message": "Error al crear la nota"
-  }
-  ```
-
----
-
-#### 2. Actualizar Nota (updateNote)
-
-https://localhost:5000/api/v1/notes/updatenote
-
-**Método:** `PUT`  
-**Ruta:** `/api/v1/notes/updatenote`  
-
-##### Descripción
-Actualiza una nota existente y registra el historial de la acción.
-
-##### Parámetros del Cuerpo de la Solicitud
+- **400 Bad Request**
 ```json
 {
-  "noteId": "ObjectId", // ID de la nota a actualizar (requerido)
-  "userId": "ObjectId", // ID del usuario que realiza la actualización (requerido)
-  "title": "string",     // Título de la nota (opcional)
-  "content": "string"    // Contenido de la nota (opcional)
+  "error": "User  ID, title, and content are required"
+}
+```
+- **404 Not Found**
+```json
+{
+  "error": "User  not found"
+}
+```
+- **500 Internal Server Error**
+```json
+{
+  "message": "Error al crear la nota"
 }
 ```
 
-##### Respuesta Exitosa
-- **Código:** `200 OK`
-- **Cuerpo:**
+#### 3. Update Note
+- **Endpoint:** `PUT /api/v1/notes/updatenote`
+- **Description:** Updates an existing note.
+
+##### Request Body
+```json
+{
+  "noteId": "ObjectId",
+  "userId": "ObjectId",
+  "title": "string",
+  "content": "string"
+}
+```
+
+##### Responses
+- **200 OK**
 ```json
 {
   "message": "Note updated successfully",
-  "token": "JWT_TOKEN" // Token JWT generado para la nota actualizada
+  "token": "JWT_TOKEN"
+}
+```
+- **400 Bad Request**
+```json
+{
+  "error": "Note ID and User ID are required"
+}
+```
+- **404 Not Found**
+```json
+{
+  "error": "Note not found"
+}
+```
+- **500 Internal Server Error**
+```json
+{
+  "message": "Error updating note"
 }
 ```
 
-##### Respuestas de Error
-- **Código:** `400 Bad Request`
-  - **Cuerpo:**
-  ```json
-  {
-    "error": "Note ID and User ID are required"
-  }
-  ```
-
-- **Código:** `404 Not Found`
-  - **Cuerpo:**
-  ```json
-  {
-    "error": "Note not found"
-  }
-  ```
-
-- **Código:** `500 Internal Server Error`
-  - **Cuerpo:**
-  ```json
-  {
-    "message": "Error updating note"
-  }
-  ```
-
----
-
-Si necesitas más modificaciones o información, ¡avísame!
-
+### Notes
+- Ensure that `username` and ` email` are unique when creating a user.
+- Use the `JWT_TOKEN` returned in the response to authenticate subsequent API requests.
+- Replace `ObjectId` with the actual MongoDB ObjectId for the user or note.

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // Define el esquema de la nota
 const noteSchema = new mongoose.Schema({
+  visualization: { type: Boolean, default: false }, // O el valor por defecto que desees
   userId: { type: mongoose.Schema.Types.ObjectId, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
@@ -22,6 +23,7 @@ const noteSchema = new mongoose.Schema({
   collection: 'NOTE',
   versionKey: false,
 });
+
 
 // Crear el modelo
 const Note = mongoose.model('Note', noteSchema);
@@ -114,24 +116,24 @@ class NoteController {
   async update(req, res) {
     try {
       const { noteId, userId, title, content } = req.body;
-  
+
       if (!noteId || !userId) {
         return res.status(400).json({ error: 'Note ID and User ID are required' });
       }
-  
+
       // Buscar la nota a actualizar
       const note = await Note.findById(noteId);
       if (!note) {
         return res.status(404).json({ error: 'Note not found' });
       }
-  
+
       // Recoger datos anteriores
       const previousData = {
         title: note.title,
         content: note.content,
         updatedAt: note.updatedAt
       };
-  
+
       // Actualizar solo si hay cambios
       let isUpdated = false;
       if (title !== undefined) {
@@ -142,15 +144,15 @@ class NoteController {
         note.content = content;
         isUpdated = true; // Marcar como actualizado
       }
-  
+
       // Actualizar la fecha de modificación solo si hubo cambios
       if (isUpdated) {
         note.updatedAt = new Date();
         await note.save();
-  
+
         // Buscar el historial existente para la nota
         const existingHistory = await History.findOne({ noteId: note._id });
-  
+
         if (existingHistory) {
           // Solo agregar contenido anterior si hay cambios
           existingHistory.previousContent.push(previousData); // Agregar al historial existente
@@ -167,12 +169,12 @@ class NoteController {
             previousContent: [previousData], // Guardar los datos anteriores
             newContent: content !== undefined ? content : note.content, // Usar el nuevo contenido si se cambió
           };
-  
+
           const historyEntry = new History(historyData);
           await historyEntry.save();
         }
       }
-  
+
       // Generar el token JWT
       const token = jwt.sign({
         _id: note._id,
@@ -182,11 +184,11 @@ class NoteController {
         createdAt: note.createdAt,
         updatedAt: note.updatedAt
       }, process.env.JWT_SECRET);
-  
+
       // Retornar el mensaje y el token
-      return res.status(200).json({ 
-        message: 'Note updated successfully', 
-        token: token 
+      return res.status(200).json({
+        message: 'Note updated successfully',
+        token: token
       });
     } catch (error) {
       console.error('Error updating note:', error);
@@ -194,61 +196,98 @@ class NoteController {
     }
   }
 
-    // Método para obtener notas del usuario a partir del token JWT
-    async getUserNotes(req, res) {
-      try {
+  async getUserNotes(req, res) {
+    try {
         const token = req.cookies.auth_token;
-  
+
         if (!token) {
-          return res.status(401).json({ error: 'No token provided' });
+            return res.status(401).json({ error: 'No token provided' });
         }
-  
+
         // Decodificar el token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userEmail = decoded.email; // Obtener el correo del token
-  
+
         // Paso 1: Buscar el usuario por correo y obtener su _id
         const user = await mongoose.model('USER').findOne({ email: userEmail });
         if (!user) {
-          return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'User not found' });
         }
-  
+
         // Paso 2: Usar el ID del usuario para buscar todas las notas asociadas en la colección NOTE
-        const notes = await Note.find({ userId: user._id });
-  
+        // Filtrar las notas para excluir aquellas con visualization: false
+        const notes = await Note.find({ 
+            userId: user._id,
+            visualization: { $ne: false } // Excluir notas donde visualization sea false
+        });
+
         return res.status(200).json(notes);
-      } catch (error) {
+    } catch (error) {
         console.error('Error al obtener las notas del usuario:', error);
         return res.status(500).json({ error: 'Error fetching user notes' });
-      }
     }
+}
 
 
 
 
-    async getNoteById(req, res) {
-      try {
-        const { id } = req.params; // Obtener el id desde los parámetros de la ruta
-  
-        // Validar que el id esté presente
-        if (!id) {
+
+  async getNoteById(req, res) {
+    try {
+      const { id } = req.params; // Obtener el id desde los parámetros de la ruta
+
+      // Validar que el id esté presente
+      if (!id) {
+        return res.status(400).json({ error: 'Note ID is required' });
+      }
+
+      // Buscar la nota por id
+      const note = await Note.findById(id);
+      if (!note) {
+        return res.status(404).json({ error: 'Note not found' });
+      }
+
+      return res.status(200).json(note); // Devolver la nota encontrada
+    } catch (error) {
+      console.error('Error fetching note by ID:', error);
+      return res.status(500).json({ error: 'Error fetching note' });
+    }
+  }
+
+
+// Actualiza el método toggleVisualization en notecontroller.js
+
+async toggleVisualization(req, res) {
+  try {
+      const { noteId } = req.params;
+
+      if (!noteId) {
           return res.status(400).json({ error: 'Note ID is required' });
-        }
-  
-        // Buscar la nota por id
-        const note = await Note.findById(id);
-        if (!note) {
-          return res.status(404).json({ error: 'Note not found' });
-        }
-  
-        return res.status(200).json(note); // Devolver la nota encontrada
-      } catch (error) {
-        console.error('Error fetching note by ID:', error);
-        return res.status(500).json({ error: 'Error fetching note' });
       }
-    }
 
-    
+      // Actualiza la visualización directamente
+      const result = await Note.updateOne(
+          { _id: noteId },
+          { $set: { visualization: false } } // Establecer visualization a false
+      );
+
+      if (result.modifiedCount === 0) {
+          return res.status(404).json({ error: 'Note not found or no change made' });
+      }
+
+      return res.status(200).json({
+          message: 'Note visualization updated successfully',
+          visualization: false,
+      });
+  } catch (error) {
+      console.error('Error toggling visualization:', error);
+      return res.status(500).json({ message: 'Error toggling visualization' });
+  }
+}
+
+
+
+
 
 }
 

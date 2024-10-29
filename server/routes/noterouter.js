@@ -7,12 +7,15 @@ const router = express.Router();
 router.post('/createnote', (req, res) => noteController.create(req, res));
 
 // Ruta para actualizar una nota y crear un historial
-router.put('/updatenote', (req, res) => noteController.update(req, res)); // Cambié a PUT para actualizar
+router.put('/updatenote', (req, res) => noteController.update(req, res));
 
 // Ruta para obtener notas del usuario
-router.get('/getUserNotes', (req, res) => noteController.getUserNotes(req, res)); // Nueva ruta para obtener notas
+router.get('/getUserNotes', (req, res) => noteController.getUserNotes(req, res));
 
 // Ruta para obtener una nota por ID
-router.get('/note/:id', (req, res) => noteController.getNoteById(req, res)); // Nueva ruta para obtener una nota por ID
+router.get('/note/:id', (req, res) => noteController.getNoteById(req, res));
+
+// Ruta para alternar el campo visualization de una nota por ID
+router.put('/:noteId/visualization', (req, res) => noteController.toggleVisualization(req, res));
 
 export default router;

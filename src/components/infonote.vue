@@ -4,14 +4,17 @@
             <i class="fas fa-arrow-left back-icon" @click="goBack"></i>
             <div>
                 <i class="fas fa-eye" @click="showPreview = !showPreview"></i>
-                <button class="save" @click="confirmSave">
+                <button class="save" @click="showSaveModal = true">
                     <i class="fas fa-save"></i>
+                </button>
+                <button class="delete" @click="showDeleteModal = true">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         </div>
         <div class="content" v-if="!showPreview">
-            <textarea ref="title" class="editable-title" @input="updateTitle" :placeholder="'Title'" v-model="note.title"
-                @keydown="allowEnter"></textarea>
+            <textarea ref="title" class="editable-title" @input="updateTitle" :placeholder="'Title'"
+                v-model="note.title" @keydown="allowEnter"></textarea>
             <textarea ref="content" class="editable-content" @input="updateContent"
                 :placeholder="'Write your content here...'" v-model="note.content" @keydown="allowEnter"></textarea>
         </div>
@@ -25,13 +28,23 @@
         <!-- Confirmation modal for saving changes -->
         <div class="modal" v-if="showSaveModal">
             <div class="modal-content">
-                <div class="icon-message">
-                    <i class="fas fa-info-circle"></i>
-                    <p>Save changes?</p>
-                </div>
+                <i class="fas fa-info-circle"></i>
+                <p>Save changes?</p>
                 <div class="buttons">
-                    <button class="discard" @click="showSaveModal = false">Discard</button>
+                    <button class="discard" @click="showSaveModal = false">Cancel</button>
                     <button class="save" @click="confirmSave">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation modal for deleting note -->
+        <div class="modal" v-if="showDeleteModal">
+            <div class="modal-content">
+                <i class="fas fa-trash"></i>
+                <p>Are you sure you want to trash this note?</p>
+                <div class="buttons">
+                    <button class="discard" @click="showDeleteModal = false">Cancel</button>
+                    <button class="delete" @click="confirmDelete">Trash</button>
                 </div>
             </div>
         </div>
@@ -51,6 +64,7 @@ export default {
         return {
             note: { title: '', content: '', _id: '', userId: '' },
             showSaveModal: false,
+            showDeleteModal: false,
             showSuccessMessage: false,
             showPreview: false,
         };
@@ -75,7 +89,7 @@ export default {
                     const data = await response.json();
                     this.note = {
                         ...data,
-                        userId: data.userId || this.getUserIdFromToken(), // Asegura que userId esté presente
+                        userId: data.userId || this.getUserIdFromToken(),
                     };
                 } else {
                     console.error('Error fetching note details:', response.statusText);
@@ -93,7 +107,7 @@ export default {
         async confirmSave() {
             await this.updateNote();
             this.showSaveModal = false;
-            this.showSuccessMessage = true;
+            this.showSuccessMessage = true; // Show success message only on save
         },
         async updateNote() {
             try {
@@ -102,10 +116,10 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include', // Para enviar las cookies, incluido el token
+                    credentials: 'include',
                     body: JSON.stringify({
                         noteId: this.note._id,
-                        userId: this.note.userId, // Agrega el userId aquí
+                        userId: this.note.userId,
                         title: this.note.title,
                         content: this.note.content,
                     }),
@@ -119,6 +133,36 @@ export default {
                 console.error('Error updating note:', error);
             }
         },
+        async confirmDelete() {
+            await this.trashNote(); // Llama a la función trashNote
+            this.showDeleteModal = false; // Cierra el modal de eliminación
+            // Redirige a la página de inicio después de que trashNote se complete
+            window.location.href = 'home.html'; // Redirige a la página de inicio
+        },
+        async trashNote() {
+            console.log('Trying to toggle visualization for note ID:', this.note._id); // Log the ID
+            try {
+                const response = await fetch(`https://localhost:5000/api/v1/notes/${this.note._id}/visualization`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Visualization toggled:', data.visualization); // Log the response
+                    return true; // Indicate success
+                } else {
+                    console.error('Error toggling visualization:', response.statusText);
+                    return false; // Indicate failure
+                }
+            } catch (error) {
+                console.error('Error toggling visualization:', error);
+                return false; // Indicate failure
+            }
+        },
         allowEnter(event) {
             if (event.key === 'Enter') {
                 // Allow line breaks
@@ -130,8 +174,7 @@ export default {
         getUserIdFromToken() {
             const token = document.cookie
                 .split('; ')
-                .find(row => row.startsWith('auth_token='))
-                ?.split('=')[1];
+                .find(row => row.startsWith('auth_token='))?.split('=')[1];
             if (!token) return null;
 
             try {
@@ -254,6 +297,43 @@ body {
     padding: 10px;
 }
 
+.delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #000;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.modal i {
+    font-size: 30px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.modal p {
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
 .success-message {
     position: fixed;
     top: 50%;
@@ -270,4 +350,5 @@ body {
     .container {
         max-width: 100%;
     }
-}</style>
+}
+</style>
