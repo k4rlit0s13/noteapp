@@ -6,7 +6,8 @@
   "scripts": {
     "back": "node app.js",
     "front": "vite --clearScreen false",
-    "devAll": "concurrently --raw --hide \"vite\" \"npm start\" \"npm run dev\""
+    "devAll": "concurrently --raw --hide \"vite\" \"npm start\" \"npm run dev\"",
+    "build": "vite build"
   },
   "dependencies": {
     "axios": "^1.7.7",
