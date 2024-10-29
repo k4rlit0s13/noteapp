@@ -8,7 +8,7 @@ dotenv.config();
 export default defineConfig({
   root: path.resolve(__dirname, 'src'),
   plugins: [vue()],
-  base: "https://k4rlit0s13.github.io/hospital/", // URL base para GitHub Pages
+  base: "https://k4rlit0s13.github.io/noteapp/", // URL base para GitHub Pages
   server: {
     // Comentar las configuraciones HTTPS
     // https: {
