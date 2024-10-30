@@ -23,10 +23,10 @@ const __dirname = dirname(__filename);
 app.use(cors({
   origin: `https://localhost:${PORT2}`, // Cambia esto al origen de tu frontend
   credentials: true, // Permitir cookies y credenciales
-})); 
+}));
 app.use(cookieParser()); // Middleware para manejar cookies
 app.use(express.json()); // Para parsear el cuerpo de las peticiones como JSON
-app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos
+app.use(express.static(join(__dirname, 'src'))); // Servir archivos estáticos desde la carpeta 'src'
 
 // Conexión a MongoDB
 connectDB(); // Conecta a MongoDB

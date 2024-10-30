@@ -90,10 +90,16 @@ NOTEAPP
 │   │   ├── home.vue
 │   │   ├── index.vue
 │   │   └── signup.vue
+│   │   └── infonote.vue
+│   │   └── search.vue
+│   │   └── createnote.vue    
 │   ├── js
 │   │   ├── home.js
 │   │   ├── main.js
 │   │   └── signup.js
+        └── infonote.js
+        └── search.js
+        └── createnote.js
 │   ├── storage
 │   │   ├── font
 │   │   └── img

@@ -72,19 +72,16 @@ export default {
             }
         },
         redirectToSignup() {
-            window.location.href = 'https://k4rlit0s13.github.io/noteapp/views/signup.html';
+            this.$router.push('/signup');
         },
         redirectToInfoNote() {
-            // Redirigir a la página de información de notas
-            window.location.href = '../views/infonote.html';
+            this.$router.push('/infonote');
         },
         redirectToCreateNote() {
-            // Redirigir a la página de creación de notas
-            window.location.href = '../views/createnote.html';
+            this.$router.push('/createnote');
         },
         openNoteDetail(noteId) {
-            // Redirigir a la página de detalle de la nota
-            window.location.href = `../views/infonote.html?noteId=${noteId}`;
+            this.$router.push({ path: '/infonote', query: { noteId } });
         },
         truncateTitle(title) {
             return title.length > 25 ? title.slice(0, 25) + '...' : title;

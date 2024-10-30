@@ -1,19 +1,16 @@
 <template>
-
-  <body>
-    <div class="container">
-      <div class="icon">
-        <img src="../storage/img/noteicon.svg" alt="Icon of a pencil inside a square" />
-      </div>
-      <div class="title">NOTES</div>
-      <input type="text" v-model="email" class="input-field" placeholder="Email" />
-      <input type="password" v-model="password" class="input-field" placeholder="Password" />
-      <button @click="login" class="button signup-button">Login</button>
-      <a class="button login-button" href="../views/signup.html">Sign Up</a>
-      <div v-if="successMessage" class="success">{{ successMessage }}</div>
-      <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+  <div class="container">
+    <div class="icon">
+      <img src="../storage/img/noteicon.svg" alt="Icon of a pencil inside a square" />
     </div>
-  </body>
+    <div class="title">NOTES</div>
+    <input type="text" v-model="email" class="input-field" placeholder="Email" />
+    <input type="password" v-model="password" class="input-field" placeholder="Password" />
+    <button @click="login" class="button signup-button">Login</button>
+    <router-link class="button login-button" to="/signup">Sign Up</router-link>
+    <div v-if="successMessage" class="success">{{ successMessage }}</div>
+    <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+  </div>
 </template>
 
 <script>
@@ -37,12 +34,11 @@ export default {
           password: this.password
         }, { withCredentials: true });
 
-
         this.successMessage = response.data.message;
 
-        // Redirigir a la página de inicio después de 2 segundos
+        // Redirigir a la ruta de inicio después de 500ms usando Vue Router
         setTimeout(() => {
-          window.location.href = '../views/home.html'; // Cambiar a window.location.href
+          this.$router.push('/'); // Cambia a la ruta de inicio
         }, 500);
 
       } catch (error) {
@@ -52,8 +48,6 @@ export default {
   }
 }
 </script>
-
-
 
 <style>
 /* Estilo previo */

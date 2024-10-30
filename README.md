@@ -63,6 +63,7 @@ npm install cross-env --save-dev
 npm install bcrypt
 npm install axios cookiejs
 npm install cookie-parser
+npm install vue-router
 ```
 
 ## Running the Application
