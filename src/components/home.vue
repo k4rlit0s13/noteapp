@@ -3,13 +3,12 @@
         <div class="header">
             <h1>Notes</h1>
             <div class="icons">
-                <i class="fas fa-search" @click="redirectToSearch"></i>
-                <i class="fas fa-info-circle" @click="redirectToInfoNote"></i>
+                <i class="fa fa-search" @click="redirectToSearch"></i>
+                <i class="fa fa-info-circle" @click="redirectToInfoNote"></i>
             </div>
         </div>
 
         <div class="container">
-            <!-- Mostrar mensaje si no hay notas -->
             <div v-if="!notes.length">
                 <img alt="Illustration of a person standing next to a large notepad and pencil"
                     src="../storage/img/note.svg" />
@@ -26,10 +25,11 @@
         </div>
 
         <div class="add-note" @click="redirectToCreateNote">
-            <i class="fas fa-plus"></i>
+            <i class="fa fa-plus"></i>
         </div>
     </div>
 </template>
+
 
 <script>
 export default {
@@ -176,4 +176,5 @@ body {
         max-width: 100%;
         height: 80px;
     }
-}</style>
+}
+</style>

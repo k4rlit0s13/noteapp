@@ -64,6 +64,7 @@ npm install bcrypt
 npm install axios cookiejs
 npm install cookie-parser
 npm install vue-router
+npm install --save font-awesome
 ```
 
 ## Running the Application
