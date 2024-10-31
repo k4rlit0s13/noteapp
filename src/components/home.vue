@@ -30,7 +30,6 @@
     </div>
 </template>
 
-
 <script>
 export default {
     name: 'home',
@@ -90,8 +89,7 @@ export default {
 };
 </script>
 
-
-<style>
+<style scoped>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -100,7 +98,8 @@ body {
 }
 
 .header {
-    width: 100%;
+    /* background-color: red; */
+    width: 100vw;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -131,24 +130,20 @@ body {
 }
 
 .notes-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
 }
 
 .note {
-    width: 100%;
-    max-width: 250px;
-    padding: 0px;
     border-radius: 10px;
     color: black;
-    height: 100px;
+    padding: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 16px;
+    height: 150px;
 }
 
 .add-note {
@@ -169,12 +164,11 @@ body {
 
 @media (max-width: 767px) {
     .notes-list {
-        flex-direction: column;
+        grid-template-columns: 1fr; /* Para móviles, una sola columna */
     }
 
     .note {
-        max-width: 100%;
-        height: 80px;
+        height: 80px; /* Altura más baja en dispositivos móviles */
     }
 }
 </style>

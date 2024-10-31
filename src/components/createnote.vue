@@ -77,6 +77,7 @@ body, .modal {
     align-items: center;
     justify-content: flex-start;
     height: 100vh;
+    width: 100vw;
 }
 
 .modal-content {
