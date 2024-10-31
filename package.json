@@ -8,7 +8,7 @@
     "front": "vite --clearScreen false",
     "dev": "vite",
     "start": "node app.js",
-    "devAll": "concurrently --raw --hide \"vite\" \"npm start\" \"npm run dev\"",
+    "devall": "concurrently --raw --hide \"vite\" \"npm start\" \"npm run dev\"",
     "build": "vite build"
   },
   "dependencies": {

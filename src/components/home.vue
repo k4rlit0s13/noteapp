@@ -48,7 +48,7 @@ export default {
         checkAuthToken() {
             const token = this.getCookie('auth_token');
             if (!token) {
-                window.location.href = '../views/index.html';
+                this.$router.push('/'); // Redirigir a index.vue
             }
         },
         getCookie(name) {
@@ -58,7 +58,7 @@ export default {
         },
         async fetchUserNotes() {
             try {
-                const response = await fetch('https://localhost:5000/api/v1/notes/getUserNotes', {
+                const response = await fetch('http://localhost:5000/api/v1/notes/getUserNotes', {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -89,6 +89,7 @@ export default {
     },
 };
 </script>
+
 
 <style>
 body {

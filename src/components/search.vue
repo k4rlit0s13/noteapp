@@ -52,7 +52,7 @@ export default {
     methods: {
         async fetchUserNotes() {
             try {
-                const response = await fetch('https://localhost:5000/api/v1/notes/getUserNotes', {
+                const response = await fetch('http://localhost:5000/api/v1/notes/getUserNotes', {
                     method: 'GET',
                     credentials: 'include',
                 });

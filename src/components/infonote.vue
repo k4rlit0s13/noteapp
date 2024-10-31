@@ -81,7 +81,7 @@ export default {
         },
         async fetchNoteDetails(noteId) {
             try {
-                const response = await fetch(`https://localhost:5000/api/v1/notes/note/${noteId}`, {
+                const response = await fetch(`http://localhost:5000/api/v1/notes/note/${noteId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
@@ -111,7 +111,7 @@ export default {
         },
         async updateNote() {
             try {
-                const response = await fetch('https://localhost:5000/api/v1/notes/updatenote', {
+                const response = await fetch('http://localhost:5000/api/v1/notes/updatenote', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export default {
         async trashNote() {
             console.log('Trying to toggle visualization for note ID:', this.note._id); // Log the ID
             try {
-                const response = await fetch(`https://localhost:5000/api/v1/notes/${this.note._id}/visualization`, {
+                const response = await fetch(`http://localhost:5000/api/v1/notes/${this.note._id}/visualization`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

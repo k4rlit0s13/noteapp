@@ -17,7 +17,7 @@
 import axios from 'axios';
 
 export default {
-  name: 'index',
+  name: 'home',
   data() {
     return {
       email: '',
@@ -29,18 +29,15 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post('https://localhost:5000/api/v1/users/authenticate', {
+        const response = await axios.post('http://localhost:5000/api/v1/users/authenticate', {
           email: this.email,
           password: this.password
         }, { withCredentials: true });
 
         this.successMessage = response.data.message;
 
-        // Redirigir a la ruta de inicio después de 500ms usando Vue Router
-        setTimeout(() => {
-          this.$router.push('/'); // Cambia a la ruta de inicio
-        }, 500);
-
+        this.$router.push('/home');
+        
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
       }
@@ -48,6 +45,8 @@ export default {
   }
 }
 </script>
+
+
 
 <style>
 /* Estilo previo */

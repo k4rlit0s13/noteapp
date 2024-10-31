@@ -44,7 +44,7 @@ export default {
             }
 
             try {
-                const response = await fetch('https://localhost:5000/api/v1/notes/createnote', {
+                const response = await fetch('http://localhost:5000/api/v1/notes/createnote', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
